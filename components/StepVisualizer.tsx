@@ -79,6 +79,9 @@ export default function StepVisualizer({
 
   const handleOnStatus = useCallback((status: LifecycleStatus) => {
     console.log("LifecycleStatus", status);
+    if (status.statusName === "success") {
+      onNextStep();
+    }
   }, []);
 
   return (
@@ -130,7 +133,6 @@ export default function StepVisualizer({
                       onStatus={handleOnStatus}
                     >
                       <TransactionButton />
-                      {/* <TransactionSponsor /> */}
                       <TransactionStatus>
                         <TransactionStatusLabel />
                         <TransactionStatusAction />

@@ -53,7 +53,6 @@ export default function StepVisualizer({
   const { address } = useAccount();
 
   const handleOnStatus = useCallback((status: LifecycleStatus) => {
-    console.log("LifecycleStatus", status);
     if (status.statusName === "success") {
       onNextStep();
     }

@@ -15,7 +15,7 @@ import Outbox from "@/abis/Outbox";
 import Calls from "@/abis/Calls";
 import ERC20 from "@/abis/ERC20";
 import PackedUserOperation from "@/abis/PackedUserOperation";
-import { RequestType } from "@/utils/types/requestType";
+import { RequestType } from "@/utils/types/request";
 import { Token, TokenType } from "@/utils/types/tokenType";
 import { Provers } from "@/utils/types/chainConfig";
 import EntryPoint from "@/abis/EntryPoint";
@@ -26,6 +26,11 @@ import Attributes from "@/utils/attributes";
 import { nativeAssetAddress } from "@/utils/constants";
 import { Call } from "@/utils/types/call";
 
+export type BuildTransactionResponse = {
+  success: boolean;
+  data: { id: Hex; calls: Call[]; args: any; dstValue: bigint };
+};
+
 export async function buildTransaction(
   sourceChainId: number,
   dstChainId: number,
@@ -33,10 +38,7 @@ export async function buildTransaction(
   to: Address,
   token: Token,
   amount: number
-): Promise<{
-  success: boolean;
-  data: Call[];
-}> {
+): Promise<BuildTransactionResponse> {
   console.log("Building transaction");
   const srcChain = chains[sourceChainId];
   const dstChain = chains[dstChainId];
@@ -89,17 +91,35 @@ export async function buildTransaction(
     requestType === RequestType.Standard ? attributes : [],
   ];
 
-  const call: Call = {
-    to: address as Hex,
-    data: encodeFunctionData({
-      abi: Outbox,
-      functionName: "sendMessage",
-      args,
-    }),
-    value,
-  };
+  const id = await srcChain.publicClient.readContract({
+    address,
+    abi: Outbox,
+    functionName: "getRequestId",
+    args: [
+      toHex(sourceChainId, { size: 32 }),
+      addressToBytes32(address),
+      dstChainIdBytes32,
+      addressToBytes32(receiver),
+      payload,
+      requestType === RequestType.Standard ? attributes : [],
+    ],
+  });
 
-  return { success: true, data: [call] };
+  const calls: Call[] = [
+    {
+      to: address as Hex,
+      data: encodeFunctionData({
+        abi: Outbox,
+        functionName: "sendMessage",
+        args,
+      }),
+      value,
+    },
+  ];
+  const dstValue =
+    token.id === TokenType.ETH ? parseEther(amount.toString()) : BigInt(0);
+
+  return { success: true, data: { id, calls, args, dstValue } };
 }
 
 async function buildPayload(

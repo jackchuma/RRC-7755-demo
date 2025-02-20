@@ -2,12 +2,14 @@ interface AmountInputProps {
   amount: string;
   onAmountChange: (value: string) => void;
   maxAmount: number;
+  disabled: boolean;
 }
 
 export default function AmountInput({
   amount,
   onAmountChange,
   maxAmount,
+  disabled,
 }: AmountInputProps) {
   return (
     <div className="mb-4 w-full">
@@ -24,7 +26,10 @@ export default function AmountInput({
           min="0"
           max={maxAmount.toString()}
           step="0.000001"
-          className="text-black w-full h-full px-2"
+          className={`text-black w-full h-full px-2 ${
+            disabled ? "bg-gray-500" : "bg-white"
+          }`}
+          disabled={disabled}
         />
       </div>
     </div>

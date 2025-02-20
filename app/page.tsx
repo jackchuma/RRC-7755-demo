@@ -8,7 +8,7 @@ import StepVisualizer from "../components/StepVisualizer";
 import WalletConnection from "../components/WalletConnection";
 import Selector from "../components/Selector";
 import AmountInput from "../components/AmountInput";
-import { RequestType } from "@/utils/types/requestType";
+import { Request, RequestType } from "@/utils/types/request";
 import { TokenType } from "@/utils/types/tokenType";
 
 const chains = [
@@ -36,11 +36,10 @@ const requests = [
 ];
 
 export default function Home() {
-  // const { address } = useAccount();
-
   const [currentStep, setCurrentStep] = useState(0);
   const [sourceChain, setSourceChain] = useState(chains[2]);
   const [destinationChain, setDestinationChain] = useState(chains[0]);
+  const [request, setRequest] = useState<Request>();
   const [sourceChainBalance, setSourceChainBalance] = useState({
     [TokenType.ETH]: 10,
     [TokenType.USDC]: 1000,
@@ -53,26 +52,17 @@ export default function Home() {
   const [selectedToken, setSelectedToken] = useState(tokens[0]);
   const [amount, setAmount] = useState("");
 
-  const steps = {
-    [RequestType.Standard]: [
-      "Submit request",
-      "Fulfill request",
-      "Generate Proof",
-      "Claim reward",
-    ],
-    [RequestType.SmartAccount]: [
-      "Create UserOperation",
-      "Bundle UserOperation",
-      "Execute cross-chain message",
-      "Generate Proof",
-      "Claim reward",
-    ],
-  };
+  const steps = [
+    "Submit request",
+    "Fulfill request",
+    "Generate Proof",
+    "Claim reward",
+  ];
 
   const handleNextStep = () => {
-    const maxSteps = steps[requestType.id as RequestType].length;
+    const maxSteps = steps.length;
     if (currentStep < maxSteps - 1) {
-      setCurrentStep(currentStep + 1);
+      setCurrentStep((prev) => prev + 1);
       // Simulate balance changes
       if (currentStep === 1) {
         const amountToSend = Number.parseFloat(amount);
@@ -113,17 +103,14 @@ export default function Home() {
     setAmount(value);
   };
 
+  const handleSetRequest = (req: Request) => {
+    setRequest(req);
+  };
+
   return (
     <div className="min-h-screen bg-[#101218] text-white p-8">
       <h1 className="text-4xl font-bold text-center mb-8">RRC-7755 Demo</h1>
       <WalletConnection />
-      {/* {address && (
-        <button
-          onClick={() => getEntryPointNonce(address, 421614).then(console.log)}
-        >
-          Click Me
-        </button>
-      )} */}
       <div className="flex flex-col lg:flex-row justify-between items-start mt-8">
         <div className="w-full lg:w-1/4">
           <Selector
@@ -132,6 +119,7 @@ export default function Home() {
             onChange={handleSourceChainChange}
             label="Source Chain"
             displayIcon={true}
+            disabled={currentStep > 0}
           />
           <ChainVisualizer
             chain={sourceChain}
@@ -145,6 +133,7 @@ export default function Home() {
             onChange={handleRequestTypeChange}
             label="Request Type"
             displayIcon={false}
+            disabled={currentStep > 0}
           />
           <Selector
             items={tokens}
@@ -152,15 +141,17 @@ export default function Home() {
             onChange={handleTokenChange}
             label="Select Token"
             displayIcon={false}
+            disabled={currentStep > 0}
           />
           <AmountInput
             amount={amount}
             onAmountChange={handleAmountChange}
             maxAmount={sourceChainBalance[selectedToken.id]}
+            disabled={currentStep > 0}
           />
         </div>
         <StepVisualizer
-          steps={steps[requestType.id as RequestType]}
+          steps={steps}
           currentStep={currentStep}
           onNextStep={handleNextStep}
           sourceChain={sourceChain}
@@ -168,6 +159,8 @@ export default function Home() {
           requestType={requestType.id as RequestType}
           selectedToken={selectedToken}
           amount={+amount}
+          request={request}
+          setRequest={handleSetRequest}
         />
         <div className="w-full lg:w-1/4">
           <Selector
@@ -176,6 +169,7 @@ export default function Home() {
             onChange={handleDestinationChainChange}
             label="Destination Chain"
             displayIcon={true}
+            disabled={currentStep > 0}
           />
           <ChainVisualizer
             chain={destinationChain}

@@ -1,21 +1,18 @@
 import { useAccount } from "wagmi";
-import { useCallback, useEffect, useState } from "react";
-import { ContractFunctionParameters, zeroAddress } from "viem";
+import { useCallback } from "react";
 import {
   LifecycleStatus,
   Transaction,
   TransactionButton,
-  TransactionSponsor,
   TransactionStatus,
   TransactionStatusAction,
   TransactionStatusLabel,
 } from "@coinbase/onchainkit/transaction";
 
-import { RequestType } from "@/utils/types/requestType";
+import { Request, RequestType } from "@/utils/types/request";
 import { SelectionItem } from "@/utils/types/selectionItem";
 import { Token } from "@/utils/types/tokenType";
-import { buildTransaction } from "@/app/lib/actions";
-import { Call } from "@/utils/types/call";
+import useTransactionParams from "@/hooks/useTransactionParams";
 
 interface StepVisualizerProps {
   steps: string[];
@@ -26,6 +23,8 @@ interface StepVisualizerProps {
   requestType: RequestType;
   selectedToken: Token;
   amount: number;
+  request?: Request;
+  setRequest: (request: Request) => void;
 }
 
 export default function StepVisualizer({
@@ -37,45 +36,20 @@ export default function StepVisualizer({
   requestType,
   selectedToken,
   amount,
+  request,
+  setRequest,
 }: StepVisualizerProps) {
-  let { address } = useAccount();
-
-  if (!address) {
-    address = zeroAddress;
-  }
-
-  const [calls, setCalls] = useState<Call[]>([]);
-
-  useEffect(() => {
-    if (
-      address != zeroAddress &&
-      amount > 0 &&
-      sourceChain.id !== destinationChain.id
-    ) {
-      buildTransaction(
-        sourceChain.id,
-        destinationChain.id,
-        requestType,
-        address,
-        selectedToken,
-        amount
-      ).then((res) => {
-        console.log(res);
-        if (res.success) {
-          setCalls(res.data);
-        }
-      });
-    } else {
-      setCalls([]);
-    }
-  }, [
-    address,
-    amount,
-    sourceChain.id,
-    destinationChain.id,
+  const { calls } = useTransactionParams({
+    currentStep,
+    sourceChain,
+    destinationChain,
     requestType,
-    selectedToken.id,
-  ]);
+    selectedToken,
+    amount,
+    request,
+    setRequest,
+  });
+  const { address } = useAccount();
 
   const handleOnStatus = useCallback((status: LifecycleStatus) => {
     console.log("LifecycleStatus", status);
@@ -83,6 +57,8 @@ export default function StepVisualizer({
       onNextStep();
     }
   }, []);
+
+  const srcChainTransactionSteps = [0, 3];
 
   return (
     <div className="w-full lg:w-1/2 mt-8 lg:mt-0 lg:px-8">
@@ -128,7 +104,11 @@ export default function StepVisualizer({
                       Sending {amount} {selectedToken.icon}
                     </p>
                     <Transaction
-                      chainId={sourceChain.id}
+                      chainId={
+                        srcChainTransactionSteps.includes(currentStep)
+                          ? sourceChain.id
+                          : destinationChain.id
+                      }
                       calls={calls}
                       onStatus={handleOnStatus}
                     >

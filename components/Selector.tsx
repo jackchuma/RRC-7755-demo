@@ -8,6 +8,7 @@ interface ChainSelectorProps {
   onChange: (id: number) => void;
   label: string;
   displayIcon: boolean;
+  disabled: boolean;
 }
 
 export default function Selector({
@@ -16,13 +17,25 @@ export default function Selector({
   onChange,
   label,
   displayIcon,
+  disabled,
 }: ChainSelectorProps) {
   const [displayDropdown, setDisplayDropdown] = useState(false);
+
+  const handleOpenDisplay = () => {
+    if (disabled) return;
+    setDisplayDropdown(true);
+  };
 
   const handleSelection = (id: number) => {
     setDisplayDropdown(false);
     onChange(id);
   };
+
+  const selectionClassName = `w-full h-10 ${
+    disabled ? "bg-gray-500" : "bg-white"
+  } rounded-md flex items-center justify-between px-4 ${
+    disabled ? "cursor-not-allowed" : "cursor-pointer"
+  }`;
 
   return (
     <>
@@ -34,10 +47,7 @@ export default function Selector({
       )}
       <div className="mb-4 relative">
         <label className="block text-sm font-medium mb-2">{label}</label>
-        <div
-          className="border w-full h-10 bg-white rounded-md flex items-center justify-between px-4 cursor-pointer"
-          onClick={() => setDisplayDropdown(true)}
-        >
+        <div className={selectionClassName} onClick={handleOpenDisplay}>
           <div className="w-full text-black">
             {displayIcon && selected.icon} {selected.name}
           </div>

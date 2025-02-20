@@ -1,6 +1,6 @@
 import { createPublicClient, http } from "viem";
 import { arbitrumSepolia, baseSepolia, optimismSepolia } from "viem/chains";
-import { ChainConfig, Provers } from "./types/chainConfig";
+import { ChainConfig, Provers } from "../utils/types/chainConfig";
 
 export default {
   // Arbitrum Sepolia

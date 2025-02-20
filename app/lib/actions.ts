@@ -21,7 +21,7 @@ import { Provers } from "@/utils/types/chainConfig";
 import EntryPoint from "@/abis/EntryPoint";
 import MockAccount from "@/abis/MockAccount";
 import addressToBytes32 from "@/utils/addressToBytes32";
-import chains from "@/utils/chains";
+import chains from "@/config/chains";
 import Attributes from "@/utils/attributes";
 import { nativeAssetAddress } from "@/utils/constants";
 import { Call } from "@/utils/types/call";

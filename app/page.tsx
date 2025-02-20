@@ -10,6 +10,7 @@ import Selector from "../components/Selector";
 import AmountInput from "../components/AmountInput";
 import { Request, RequestType } from "@/utils/types/request";
 import { TokenType } from "@/utils/types/tokenType";
+import { steps } from "@/config/steps";
 
 const chains = [
   { id: 84532, name: "Base Sepolia", icon: "🔷" },
@@ -51,13 +52,6 @@ export default function Home() {
   const [requestType, setRequestType] = useState(requests[0]);
   const [selectedToken, setSelectedToken] = useState(tokens[0]);
   const [amount, setAmount] = useState("");
-
-  const steps = [
-    "Submit request",
-    "Fulfill request",
-    "Generate Proof",
-    "Claim reward",
-  ];
 
   const handleNextStep = () => {
     const maxSteps = steps.length;

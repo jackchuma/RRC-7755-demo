@@ -13,9 +13,10 @@ import { Request, RequestType } from "@/utils/types/request";
 import { SelectionItem } from "@/utils/types/selectionItem";
 import { Token } from "@/utils/types/tokenType";
 import useTransactionParams from "@/hooks/useTransactionParams";
+import { Step, TransactionTarget } from "@/utils/types/step";
 
 interface StepVisualizerProps {
-  steps: string[];
+  steps: Step[];
   currentStep: number;
   onNextStep: () => void;
   sourceChain: SelectionItem;
@@ -58,7 +59,15 @@ export default function StepVisualizer({
     }
   }, []);
 
-  const srcChainTransactionSteps = [0, 3];
+  let transactionChain: number;
+
+  switch (steps[currentStep].chainTarget) {
+    case TransactionTarget.SRC:
+      transactionChain = sourceChain.id;
+      break;
+    case TransactionTarget.DST:
+      transactionChain = destinationChain.id;
+  }
 
   return (
     <div className="w-full lg:w-1/2 mt-8 lg:mt-0 lg:px-8">
@@ -90,7 +99,7 @@ export default function StepVisualizer({
                   : "text-gray-500"
               }`}
             >
-              {step}
+              {step.name}
             </h3>
             {index === currentStep && (
               <div className="mt-4">
@@ -98,17 +107,13 @@ export default function StepVisualizer({
                   {sourceChain.icon} {sourceChain.name} →{" "}
                   {destinationChain.icon} {destinationChain.name}
                 </p>
-                {address && calls.length > 0 && (
+                {address && transactionChain && calls.length > 0 && (
                   <>
                     <p className="text-sm text-gray-400 mb-2">
                       Sending {amount} {selectedToken.icon}
                     </p>
                     <Transaction
-                      chainId={
-                        srcChainTransactionSteps.includes(currentStep)
-                          ? sourceChain.id
-                          : destinationChain.id
-                      }
+                      chainId={transactionChain}
                       calls={calls}
                       onStatus={handleOnStatus}
                     >

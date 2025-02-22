@@ -11,6 +11,7 @@ import AmountInput from "../components/AmountInput";
 import { Request, RequestType } from "@/utils/types/request";
 import { TokenType } from "@/utils/types/tokenType";
 import { steps } from "@/config/steps";
+import { ProofType } from "@/utils/types/proof";
 
 const chains = [
   { id: 84532, name: "Base Sepolia", icon: "🔷" },
@@ -41,6 +42,7 @@ export default function Home() {
   const [sourceChain, setSourceChain] = useState(chains[2]);
   const [destinationChain, setDestinationChain] = useState(chains[0]);
   const [request, setRequest] = useState<Request>();
+  const [proof, setProof] = useState<ProofType>();
   const [sourceChainBalance, setSourceChainBalance] = useState({
     [TokenType.ETH]: 10,
     [TokenType.USDC]: 1000,
@@ -101,6 +103,10 @@ export default function Home() {
     setRequest(req);
   };
 
+  const handleSetProof = (p?: ProofType) => {
+    setProof(p);
+  };
+
   return (
     <div className="min-h-screen bg-[#101218] text-white p-8">
       <h1 className="text-4xl font-bold text-center mb-8">RRC-7755 Demo</h1>
@@ -155,6 +161,8 @@ export default function Home() {
           amount={+amount}
           request={request}
           setRequest={handleSetRequest}
+          proof={proof}
+          setProof={handleSetProof}
         />
         <div className="w-full lg:w-1/4">
           <Selector

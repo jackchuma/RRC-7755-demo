@@ -1,16 +1,12 @@
 import { buildTransaction, BuildTransactionResponse } from "@/app/lib/actions";
 import { buildFulfillmentCall } from "@/app/lib/buildFulfillmentCall";
-import { generateProof } from "@/app/lib/generateProof";
-import chains from "@/config/chains";
 import addressToBytes32 from "@/utils/addressToBytes32";
 import { Call } from "@/utils/types/call";
-import { ProofType } from "@/utils/types/proof";
 import { Request, RequestType } from "@/utils/types/request";
 import { SelectionItem } from "@/utils/types/selectionItem";
 import { Token } from "@/utils/types/tokenType";
 import { useEffect, useState } from "react";
 import { Address, toHex, zeroAddress } from "viem";
-import { sepolia } from "viem/chains";
 import { useAccount } from "wagmi";
 
 interface UseTransactionParamsProps {
@@ -32,7 +28,6 @@ export default function useTransactionParams(props: UseTransactionParamsProps) {
   }
 
   const [calls, setCalls] = useState<Call[]>([]);
-  const [proof, setProof] = useState<ProofType>();
 
   useEffect(() => {
     setCalls([]);
@@ -50,12 +45,6 @@ export default function useTransactionParams(props: UseTransactionParamsProps) {
       case 1:
         handleBuildFulfillment(props.request);
         break;
-      default:
-        genProof(
-          props.sourceChain.id,
-          props.destinationChain.id,
-          props.request
-        );
     }
   }, [
     address,
@@ -130,27 +119,5 @@ export default function useTransactionParams(props: UseTransactionParamsProps) {
     }
   };
 
-  const genProof = (srcChainId: number, dstChainId: number, req?: Request) => {
-    if (!req) {
-      setProof(undefined);
-      return;
-    }
-
-    const timestampCutoff = 0; // TODO: add timestamp cutoff to req
-
-    generateProof(
-      srcChainId,
-      sepolia.id,
-      dstChainId,
-      req.id,
-      timestampCutoff
-    ).then((res) => {
-      console.log("Proof generation res", res);
-      if (res.success) {
-        setProof(res.data.proof);
-      }
-    });
-  };
-
-  return { calls, proof };
+  return { calls };
 }

@@ -14,6 +14,10 @@ import { SelectionItem } from "@/utils/types/selectionItem";
 import { Token } from "@/utils/types/tokenType";
 import useTransactionParams from "@/hooks/useTransactionParams";
 import { Step, TransactionTarget } from "@/utils/types/step";
+import ProofVisualizer from "./ProofVisualizer";
+import { ProofType } from "@/utils/types/proof";
+import { generateProof } from "@/app/lib/generateProof";
+import { sepolia } from "viem/chains";
 
 interface StepVisualizerProps {
   steps: Step[];
@@ -26,6 +30,8 @@ interface StepVisualizerProps {
   amount: number;
   request?: Request;
   setRequest: (request: Request) => void;
+  proof?: ProofType;
+  setProof: (proof?: ProofType) => void;
 }
 
 export default function StepVisualizer({
@@ -39,6 +45,8 @@ export default function StepVisualizer({
   amount,
   request,
   setRequest,
+  proof,
+  setProof,
 }: StepVisualizerProps) {
   const { calls } = useTransactionParams({
     currentStep,
@@ -57,6 +65,36 @@ export default function StepVisualizer({
       onNextStep();
     }
   }, []);
+
+  const handleGenerateProof = async () => {
+    await genProof(sourceChain.id, destinationChain.id, request);
+  };
+
+  const genProof = async (
+    srcChainId: number,
+    dstChainId: number,
+    req?: Request
+  ) => {
+    if (!req) {
+      setProof(undefined);
+      return;
+    }
+
+    const timestampCutoff = 0; // TODO: add timestamp cutoff to req
+
+    const res = await generateProof(
+      srcChainId,
+      sepolia.id,
+      dstChainId,
+      req.id,
+      timestampCutoff
+    );
+
+    console.log("Proof generation res", res);
+    if (res.success) {
+      setProof(res.data.proof);
+    }
+  };
 
   let transactionChain: number;
 
@@ -106,6 +144,20 @@ export default function StepVisualizer({
                   {sourceChain.icon} {sourceChain.name} →{" "}
                   {destinationChain.icon} {destinationChain.name}
                 </p>
+                {currentStep === 2 && (
+                  <>
+                    {proof ? (
+                      <>
+                        <ProofVisualizer proof={proof} />
+                        <button onClick={onNextStep}>Next</button>
+                      </>
+                    ) : (
+                      <button onClick={handleGenerateProof}>
+                        Generate Proof
+                      </button>
+                    )}
+                  </>
+                )}
                 {address && transactionChain && calls.length > 0 && (
                   <>
                     <p className="text-sm text-gray-400 mb-2">

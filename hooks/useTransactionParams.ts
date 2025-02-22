@@ -1,4 +1,5 @@
 import { buildTransaction, BuildTransactionResponse } from "@/app/lib/actions";
+import { buildClaimRewardCall } from "@/app/lib/buildClaimRewardCall";
 import { buildFulfillmentCall } from "@/app/lib/buildFulfillmentCall";
 import { buildShoyuBashiCall } from "@/app/lib/buildShoyuBashiCall";
 import addressToBytes32 from "@/utils/addressToBytes32";
@@ -50,6 +51,9 @@ export default function useTransactionParams(props: UseTransactionParamsProps) {
         break;
       case 3:
         handleBuildShoyuBashiCall(props.request);
+        break;
+      case 4:
+        handleBuildClaimRewardCall(address, props.request);
         break;
     }
   }, [
@@ -109,6 +113,20 @@ export default function useTransactionParams(props: UseTransactionParamsProps) {
 
     buildShoyuBashiCall(req, props.proof).then((res) => {
       console.log("Build ShoyuBashi call res", res);
+      if (res.success) {
+        setCalls(res.data.calls);
+      }
+    });
+  };
+
+  const handleBuildClaimRewardCall = (addr: Address, req?: Request) => {
+    if (!req || addr == zeroAddress || !props.proof) {
+      setCalls([]);
+      return;
+    }
+
+    buildClaimRewardCall(req, props.proof, addr).then((res) => {
+      console.log("Build Claim Reward res", res);
       if (res.success) {
         setCalls(res.data.calls);
       }

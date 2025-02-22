@@ -45,7 +45,7 @@ export async function buildTransaction(
 
   const needsHashi = true; // defaulting to true for this demo so we don't have to wait for the destination chain's state finality
   // const needsHashi = !srcChain.exposesL1State || !dstChain.sharesStateWithL1;
-  let finalityDelay = 10; // seconds
+  let finalityDelay = 1; // seconds
 
   if (!needsHashi) {
     if (dstChainId === 421614) {

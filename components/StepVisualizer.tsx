@@ -61,11 +61,14 @@ export default function StepVisualizer({
   });
   const { address } = useAccount();
 
-  const handleOnStatus = useCallback((status: LifecycleStatus) => {
-    if (status.statusName === "success") {
-      onNextStep();
-    }
-  }, []);
+  const handleOnStatus = useCallback(
+    (status: LifecycleStatus) => {
+      if (status.statusName === "success") {
+        onNextStep();
+      }
+    },
+    [currentStep]
+  );
 
   const handleGenerateProof = async () => {
     await genProof(sourceChain.id, destinationChain.id, request);

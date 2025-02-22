@@ -4,6 +4,7 @@ import ShoyuBashi from "@/abis/ShoyuBashi";
 import Attributes from "@/utils/attributes";
 import decodeUserOp from "@/utils/decodeUserOp";
 import extractAttributesFromUserOp from "@/utils/extractAttributesFromUserOp";
+import { isHashiProofType } from "@/utils/isHashiProofType";
 import { Call } from "@/utils/types/call";
 import { HashiProofType, ProofType } from "@/utils/types/proof";
 import { Request, RequestType } from "@/utils/types/request";
@@ -53,10 +54,6 @@ export async function buildShoyuBashiCall(
     },
   ];
   return { success: true, data: { calls } };
-}
-
-function isHashiProofType(proof: ProofType): proof is HashiProofType {
-  return (proof as HashiProofType).rlpEncodedBlockHeader !== undefined;
 }
 
 function extractBlockNumber(rlpEncodedBlockHeader: Hex): bigint {

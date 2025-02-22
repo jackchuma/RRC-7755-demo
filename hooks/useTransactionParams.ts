@@ -1,7 +1,9 @@
 import { buildTransaction, BuildTransactionResponse } from "@/app/lib/actions";
 import { buildFulfillmentCall } from "@/app/lib/buildFulfillmentCall";
+import { buildShoyuBashiCall } from "@/app/lib/buildShoyuBashiCall";
 import addressToBytes32 from "@/utils/addressToBytes32";
 import { Call } from "@/utils/types/call";
+import { ProofType } from "@/utils/types/proof";
 import { Request, RequestType } from "@/utils/types/request";
 import { SelectionItem } from "@/utils/types/selectionItem";
 import { Token } from "@/utils/types/tokenType";
@@ -18,6 +20,7 @@ interface UseTransactionParamsProps {
   amount: number;
   request?: Request;
   setRequest: (request: Request) => void;
+  proof?: ProofType;
 }
 
 export default function useTransactionParams(props: UseTransactionParamsProps) {
@@ -44,6 +47,9 @@ export default function useTransactionParams(props: UseTransactionParamsProps) {
         break;
       case 1:
         handleBuildFulfillment(props.request);
+        break;
+      case 3:
+        handleBuildShoyuBashiCall(props.request);
         break;
     }
   }, [
@@ -89,6 +95,20 @@ export default function useTransactionParams(props: UseTransactionParamsProps) {
 
     buildFulfillmentCall(req, address).then((res) => {
       console.log("Fulfillment res", res);
+      if (res.success) {
+        setCalls(res.data.calls);
+      }
+    });
+  };
+
+  const handleBuildShoyuBashiCall = (req?: Request) => {
+    if (!req || !address || !props.proof) {
+      setCalls([]);
+      return;
+    }
+
+    buildShoyuBashiCall(req, props.proof).then((res) => {
+      console.log("Build ShoyuBashi call res", res);
       if (res.success) {
         setCalls(res.data.calls);
       }

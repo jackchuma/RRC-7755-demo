@@ -1,5 +1,6 @@
 import { Address, Hex, toHex } from "viem";
 import addressToBytes32 from "./addressToBytes32";
+import bytes32ToAddress from "./bytes32ToAddress";
 
 const rewardAttributeSelector = "0xa362e5db";
 const delayAttributeSelector = "0x84f550e0";
@@ -12,8 +13,8 @@ const destinationChainSelector = "0xdff49bf1";
 export default class Attributes {
   private attributes: Hex[];
 
-  constructor() {
-    this.attributes = [];
+  constructor(startingAttributes: Hex[] = []) {
+    this.attributes = startingAttributes;
   }
 
   list(): Hex[] {
@@ -64,5 +65,15 @@ export default class Attributes {
     this.attributes.push(
       `${destinationChainSelector}${toHex(dstChainId, { size: 32 }).slice(2)}`
     );
+  }
+
+  getShoyuBashi(): Address {
+    const shoyuBashi = this.attributes.find((attr) =>
+      attr.startsWith(shoyuBashiAttributeSelector)
+    );
+    if (!shoyuBashi) {
+      throw new Error("ShoyuBashi not found");
+    }
+    return bytes32ToAddress(`0x${shoyuBashi.slice(10)}`);
   }
 }

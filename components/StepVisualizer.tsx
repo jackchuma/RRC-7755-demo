@@ -57,6 +57,7 @@ export default function StepVisualizer({
     amount,
     request,
     setRequest,
+    proof,
   });
   const { address } = useAccount();
 

@@ -110,6 +110,9 @@ export default function StepVisualizer({
       transactionChain = destinationChain.id;
   }
 
+  const buttonClassName =
+    "w-full rounded-xl px-4 py-3 font-medium text-base text-black leading-6 cursor-pointer ock-bg-primary active:bg-[var(--ock-bg-primary-active)] hover:bg-[var(--ock-bg-primary-hover)]";
+
   return (
     <div className="w-full lg:w-1/2 mt-8 lg:mt-0 lg:px-8">
       <h2 className="text-2xl font-semibold mb-4">
@@ -153,10 +156,18 @@ export default function StepVisualizer({
                     {proof ? (
                       <>
                         <ProofVisualizer proof={proof} />
-                        <button onClick={onNextStep}>Next</button>
+                        <button
+                          className={buttonClassName}
+                          onClick={onNextStep}
+                        >
+                          Next
+                        </button>
                       </>
                     ) : (
-                      <button onClick={handleGenerateProof}>
+                      <button
+                        className={buttonClassName}
+                        onClick={handleGenerateProof}
+                      >
                         Generate Proof
                       </button>
                     )}

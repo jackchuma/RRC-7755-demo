@@ -11,11 +11,11 @@ export default {
     l2OracleStorageKey:
       "0x0000000000000000000000000000000000000000000000000000000000000076",
     contracts: {
-      inbox: "0x1bb8dacba30b1cd82ce1d3d7f24e16ee549aebe8",
+      inbox: "0x5c2c743c41d7bff2cb3c1b82edbbb79e5c225baf",
       entryPoint: "0x0000000071727De22E5E9d8BAf0edAc6f37da032",
       shoyuBashi: "0xce8b068D4F7F2eb3bDAFa72eC3C4feE78CF9Ccf7",
       outboxContracts: {
-        Hashi: "0x37ce91ee91ea28b1e704fda056e791f062cad44d",
+        Hashi: "0xd6b350775dca2f45597bef27010c1a4ce75065c4",
       },
     },
     publicClient: createPublicClient({
@@ -36,13 +36,13 @@ export default {
     l2OracleStorageKey:
       "0xa6eef7e35abe7026729641147f7915573c7e97b47efa546f5f6e3230263bcb49",
     contracts: {
-      inbox: "0x30adfdab722d36b26f12f562d7cadf4cd8831c58",
+      inbox: "0x248c18c76445ab8b042d31d7609fffec800a57ba",
       entryPoint: "0x0000000071727De22E5E9d8BAf0edAc6f37da032",
       shoyuBashi: "0x6602dc9b6bd964C2a11BBdA9B2275308D1Bbc14f",
       outboxContracts: {
-        Arbitrum: "0x2504b1c3b78b2711e24eadf7ea077b0ca1b91859",
-        OPStack: "0x57ee7e881f108fbc8dcc9216b1329d0929fe2c32",
-        Hashi: "0x2b77db0e0626fb6ce0c9def53139d996efa0527d",
+        Arbitrum: "0x946ca00a551d7009019b7bbd65f4d94a48792b8a",
+        OPStack: "0x9d052b05d093a466c5138c765b980aa1e8d65dd8",
+        Hashi: "0xbb82b46c2c557861e044a28a666c00b042b82794",
       },
     },
     publicClient: createPublicClient({
@@ -64,13 +64,13 @@ export default {
       "0xa6eef7e35abe7026729641147f7915573c7e97b47efa546f5f6e3230263bcb49",
     contracts: {
       l2MessagePasser: "0x4200000000000000000000000000000000000016",
-      inbox: "0x75319530c71ee1a9ef9bd477766d82d7b2c4f068",
+      inbox: "0xe44231d6dcdeeddb5b781c4bb24d309b695d9119",
       entryPoint: "0x0000000071727De22E5E9d8BAf0edAc6f37da032",
       shoyuBashi: "0x7237bb8d1d38DF8b473b5A38eD90088AF162ad8e",
       outboxContracts: {
-        Arbitrum: "0x4b249e565c6d12a48a6946faffc4bba0b82f6487",
-        OPStack: "0x0af2dad45c60097115724bb3826930f56848d317",
-        Hashi: "0xf0c0b1cbfd50a2b7d72eb93a60ac1fd9311ea042",
+        Arbitrum: "0x0005f24b46b973067542ab17c313bd6f36b12a34",
+        OPStack: "0xbc54b421f508f18b05e70fa7326ac9e7cb600058",
+        Hashi: "0xd33467cb60a4c0c9f703fc5cfc3d4313d21c7a3c",
       },
     },
     publicClient: createPublicClient({

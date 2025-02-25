@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Address } from "viem";
 
 import ChainVisualizer from "../components/ChainVisualizer";
 import StepVisualizer from "../components/StepVisualizer";
@@ -12,6 +11,8 @@ import { Request, RequestType } from "@/utils/types/request";
 import { TokenType } from "@/utils/types/tokenType";
 import { steps } from "@/config/steps";
 import { ProofType } from "@/utils/types/proof";
+import useBalance from "@/hooks/useBalance";
+import { tokens } from "@/config/tokens";
 
 const chains = [
   { id: 84532, name: "Base Sepolia", icon: "🔷" },
@@ -19,15 +20,6 @@ const chains = [
   { id: 421614, name: "Arbitrum Sepolia", icon: "🔵" },
 ];
 
-const tokens = [
-  {
-    id: TokenType.ETH,
-    name: "ETH",
-    icon: "ETH",
-    address: "0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee" as Address,
-  },
-  { id: TokenType.USDC, name: "USDC", icon: "USDC", address: "" as Address }, // TODO: Deploy mock ERC20
-];
 const requests = [
   { id: RequestType.Standard, name: "Standard Request", icon: "" },
   {
@@ -43,34 +35,17 @@ export default function Home() {
   const [destinationChain, setDestinationChain] = useState(chains[0]);
   const [request, setRequest] = useState<Request>();
   const [proof, setProof] = useState<ProofType>();
-  const [sourceChainBalance, setSourceChainBalance] = useState({
-    [TokenType.ETH]: 10,
-    [TokenType.USDC]: 1000,
-  });
-  const [destinationChainBalance, setDestinationChainBalance] = useState({
-    [TokenType.ETH]: 5,
-    [TokenType.USDC]: 500,
-  });
   const [requestType, setRequestType] = useState(requests[0]);
   const [selectedToken, setSelectedToken] = useState(tokens[0]);
   const [amount, setAmount] = useState("");
+
+  const sourceChainBalance = useBalance({ chainId: sourceChain.id });
+  const destinationChainBalance = useBalance({ chainId: destinationChain.id });
 
   const handleNextStep = () => {
     const maxSteps = steps.length;
     if (currentStep < maxSteps - 1) {
       setCurrentStep((prev) => prev + 1);
-      // Simulate balance changes
-      if (currentStep === 1) {
-        const amountToSend = Number.parseFloat(amount);
-        setSourceChainBalance((prev) => ({
-          ...prev,
-          [selectedToken.id]: prev[selectedToken.id] - amountToSend,
-        }));
-        setDestinationChainBalance((prev) => ({
-          ...prev,
-          [selectedToken.id]: prev[selectedToken.id] + amountToSend,
-        }));
-      }
     }
   };
 

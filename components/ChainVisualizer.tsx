@@ -31,13 +31,13 @@ export default function ChainVisualizer({
       <div className="text-xl mb-2">
         ETH Balance:{" "}
         <span className="font-bold text-green-400">
-          {balance[TokenType.ETH]} ETH
+          {balance[TokenType.ETH].toLocaleString()} ETH
         </span>
       </div>
       <div className="text-xl">
         USDC Balance:{" "}
         <span className="font-bold text-green-400">
-          {balance[TokenType.USDC]} USDC
+          {balance[TokenType.USDC].toLocaleString()} USDC
         </span>
       </div>
       {isActive && (

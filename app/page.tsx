@@ -13,6 +13,7 @@ import { steps } from "@/config/steps";
 import { ProofType } from "@/utils/types/proof";
 import useBalance from "@/hooks/useBalance";
 import { tokens } from "@/config/tokens";
+import AddressInput from "@/components/AddressInput";
 
 const chains = [
   { id: 84532, name: "Base Sepolia", icon: "🔷" },
@@ -33,6 +34,7 @@ export default function Home() {
   const [currentStep, setCurrentStep] = useState(0);
   const [sourceChain, setSourceChain] = useState(chains[2]);
   const [destinationChain, setDestinationChain] = useState(chains[0]);
+  const [destinationAddress, setDestinationAddress] = useState("");
   const [request, setRequest] = useState<Request>();
   const [proof, setProof] = useState<ProofType>();
   const [requestType, setRequestType] = useState(requests[0]);
@@ -82,6 +84,10 @@ export default function Home() {
     setProof(p);
   };
 
+  const handleDestinationAddressChange = (value: string) => {
+    setDestinationAddress(value);
+  };
+
   return (
     <div className="min-h-screen bg-[#101218] text-white p-8">
       <h1 className="text-4xl font-bold text-center mb-8">RRC-7755 Demo</h1>
@@ -122,6 +128,11 @@ export default function Home() {
             amount={amount}
             onAmountChange={handleAmountChange}
             maxAmount={sourceChainBalance[selectedToken.id]}
+            disabled={currentStep > 0}
+          />
+          <AddressInput
+            destinationAddress={destinationAddress}
+            onDestinationAddressChange={handleDestinationAddressChange}
             disabled={currentStep > 0}
           />
         </div>

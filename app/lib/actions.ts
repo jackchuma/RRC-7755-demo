@@ -81,7 +81,7 @@ export async function buildTransaction(
     token,
     amount,
     to,
-    dstChain.contracts.inbox,
+    dstChain.contracts.paymaster,
     attributes,
     dstChainId
   );
@@ -128,7 +128,7 @@ async function buildPayload(
   token: Token,
   amount: number,
   to: Address,
-  inbox: Address,
+  paymaster: Address,
   attributes: Hex[],
   dstChainId: number
 ): Promise<Hex> {
@@ -153,8 +153,8 @@ async function buildPayload(
   }
 
   return await buildUserOp(
-    to,
-    inbox,
+    chains[dstChainId].contracts.smartAccount,
+    paymaster,
     attributes,
     amount,
     dstChainId,
@@ -215,8 +215,8 @@ async function buildAttributes(
 }
 
 async function buildUserOp(
-  account: Address,
-  inbox: Address,
+  smartAccount: Address,
+  paymaster: Address,
   attributes: Hex[],
   amount: number,
   dstChainId: number,
@@ -228,16 +228,16 @@ async function buildUserOp(
   const maxPriorityFeePerGas = BigInt(100_000);
   const maxFeePerGas = BigInt(100_000);
 
-  const nonce = await getEntryPointNonce(account, dstChainId);
+  const nonce = await getEntryPointNonce(smartAccount, dstChainId);
 
   const userOp = {
-    sender: account,
+    sender: smartAccount,
     nonce,
     initCode: "0x" as Hex,
     callData: encodeFunctionData({
       abi: MockAccount,
       functionName: "executeUserOp",
-      args: [inbox, addressToBytes32(token)],
+      args: [paymaster, addressToBytes32(token)],
     }),
     accountGasLimits: encodePacked(
       ["uint128", "uint128"],
@@ -248,16 +248,22 @@ async function buildUserOp(
       ["uint128", "uint128"],
       [maxPriorityFeePerGas, maxFeePerGas]
     ),
-    paymasterAndData: encodePaymasterAndData(inbox, attributes, amount),
+    paymasterAndData: encodePaymasterAndData(
+      paymaster,
+      attributes,
+      amount,
+      token
+    ),
     signature: "0x" as Hex,
   };
   return encodeAbiParameters(PackedUserOperation, [userOp]);
 }
 
 function encodePaymasterAndData(
-  inbox: Address,
+  paymaster: Address,
   attributes: Hex[],
-  amount: number
+  amount: number,
+  token: Address
 ): Hex {
   console.log("Encoding paymaster and data");
   const precheck = zeroAddress;
@@ -266,49 +272,20 @@ function encodePaymasterAndData(
   return encodePacked(
     ["address", "uint128", "uint128", "bytes"],
     [
-      inbox,
+      paymaster,
       paymasterVerificationGasLimit,
       paymasterPostOpGasLimit,
       encodeAbiParameters(
         [
-          { type: "bytes32" },
+          { type: "address" },
           { type: "uint256" },
           { type: "address" },
           { type: "bytes[]" },
         ],
-        [
-          nativeAssetAddress,
-          parseEther(amount.toString()),
-          precheck,
-          attributes,
-        ]
+        [token, parseEther(amount.toString()), precheck, attributes]
       ),
     ]
   );
-}
-
-async function getUsdPerEth(): Promise<number> {
-  console.log("Getting USD per ETH");
-  try {
-    const ethId = 1027;
-    const url = `https://pro-api.coinmarketcap.com/v2/cryptocurrency/quotes/latest?id=${ethId}`;
-    const req = {
-      headers: {
-        "X-CMC_PRO_API_KEY": process.env.CMC_API_KEY as string,
-      },
-    };
-    const res = await fetch(url, req);
-    const json = await res.json();
-
-    if (json.status.error_code) {
-      throw new Error("Error returned from CMC API");
-    }
-
-    return json.data[ethId].quote.USD.price;
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
 }
 
 async function getUserNonce(

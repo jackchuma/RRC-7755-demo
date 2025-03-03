@@ -1,3 +1,4 @@
+import { RequestType } from "@/utils/types/request";
 import { Step, TransactionTarget } from "@/utils/types/step";
 import { TokenType } from "@/utils/types/tokenType";
 
@@ -10,6 +11,7 @@ export enum StepId {
   ClaimReward,
   ApproveOutbox,
   ApprovePaymaster,
+  PrefundPaymasterGas,
 }
 
 const approveOutbox = {
@@ -25,6 +27,11 @@ const approvePaymaster = {
 const prefundPaymaster = {
   id: StepId.PreFundPaymaster,
   name: "Pre-fund Paymaster",
+  chainTarget: TransactionTarget.DST,
+};
+const prefundPaymasterGas = {
+  id: StepId.PrefundPaymasterGas,
+  name: "Prefund Paymaster Gas",
   chainTarget: TransactionTarget.DST,
 };
 const submitRequest = {
@@ -53,23 +60,47 @@ const claimReward = {
   chainTarget: TransactionTarget.SRC,
 };
 
-export const steps: Record<TokenType, Step[]> = {
-  [TokenType.ETH]: [
-    prefundPaymaster,
-    submitRequest,
-    fulfillRequest,
-    generateProof,
-    submitHashiHeader,
-    claimReward,
-  ],
-  [TokenType.USDC]: [
-    approveOutbox,
-    approvePaymaster,
-    prefundPaymaster,
-    submitRequest,
-    fulfillRequest,
-    generateProof,
-    submitHashiHeader,
-    claimReward,
-  ],
+export const steps: Record<RequestType, Record<TokenType, Step[]>> = {
+  [RequestType.Standard]: {
+    [TokenType.ETH]: [
+      prefundPaymaster,
+      submitRequest,
+      fulfillRequest,
+      generateProof,
+      submitHashiHeader,
+      claimReward,
+    ],
+    [TokenType.USDC]: [
+      approveOutbox,
+      approvePaymaster,
+      prefundPaymaster,
+      submitRequest,
+      fulfillRequest,
+      generateProof,
+      submitHashiHeader,
+      claimReward,
+    ],
+  },
+  [RequestType.SmartAccount]: {
+    [TokenType.ETH]: [
+      prefundPaymaster,
+      prefundPaymasterGas,
+      submitRequest,
+      fulfillRequest,
+      generateProof,
+      submitHashiHeader,
+      claimReward,
+    ],
+    [TokenType.USDC]: [
+      approveOutbox,
+      approvePaymaster,
+      prefundPaymaster,
+      prefundPaymasterGas,
+      submitRequest,
+      fulfillRequest,
+      generateProof,
+      submitHashiHeader,
+      claimReward,
+    ],
+  },
 };

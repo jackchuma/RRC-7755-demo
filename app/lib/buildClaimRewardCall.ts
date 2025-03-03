@@ -3,11 +3,12 @@
 import HashiProof from "@/abis/HashiProof";
 import Outbox from "@/abis/Outbox";
 import bytes32ToAddress from "@/utils/bytes32ToAddress";
+import decodeUserOp from "@/utils/decodeUserOp";
 import { isHashiProofType } from "@/utils/isHashiProofType";
 import { BuildCallsResponse } from "@/utils/types/buildCallsReponse";
 import { Call } from "@/utils/types/call";
 import { ProofType } from "@/utils/types/proof";
-import { Request } from "@/utils/types/request";
+import { Request, RequestType } from "@/utils/types/request";
 import {
   Address,
   encodeAbiParameters,
@@ -22,22 +23,31 @@ export async function buildClaimRewardCall(
 ): Promise<BuildCallsResponse> {
   console.log("buildClaimRewardCall");
   const encodedProof = encodeProof(proof);
+
+  let data = encodeFunctionData({
+    abi: Outbox,
+    functionName: "claimReward",
+    args: [
+      req.dstChain,
+      req.receiver,
+      req.payload,
+      req.attributes,
+      encodedProof,
+      address,
+    ],
+  });
+
+  if (req.requestType === RequestType.SmartAccount) {
+    const userOp = decodeUserOp(req.payload);
+    data = encodeFunctionData({
+      abi: Outbox,
+      functionName: "claimReward",
+      args: [req.dstChain, req.receiver, userOp, encodedProof, address],
+    });
+  }
+
   const calls: Call[] = [
-    {
-      to: bytes32ToAddress(req.sender),
-      data: encodeFunctionData({
-        abi: Outbox,
-        functionName: "claimReward",
-        args: [
-          req.dstChain,
-          req.receiver,
-          req.payload,
-          req.attributes,
-          encodedProof,
-          address,
-        ],
-      }),
-    },
+    { to: bytes32ToAddress(req.sender), data, value: BigInt(0) },
   ];
 
   return { success: true, data: { calls } };

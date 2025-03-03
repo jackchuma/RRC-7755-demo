@@ -12,6 +12,7 @@ type Contracts = {
   inbox: Address;
   entryPoint: Address;
   shoyuBashi: Address;
+  smartAccount: Address;
   outboxContracts: Record<string, Address>;
 };
 

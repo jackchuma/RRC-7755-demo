@@ -3,6 +3,7 @@ import { buildApproveCall } from "@/app/lib/buildApproveCall";
 import { buildClaimRewardCall } from "@/app/lib/buildClaimRewardCall";
 import { buildFulfillmentCall } from "@/app/lib/buildFulfillmentCall";
 import { buildMagicSpendCall } from "@/app/lib/buildMagicSpendCall";
+import { buildPaymasterGasCall } from "@/app/lib/buildPaymasterGasCall";
 import { buildShoyuBashiCall } from "@/app/lib/buildShoyuBashiCall";
 import { StepId } from "@/config/steps";
 import addressToBytes32 from "@/utils/addressToBytes32";
@@ -79,6 +80,9 @@ export default function useTransactionParams(props: UseTransactionParamsProps) {
           props.amount
         );
         break;
+      case StepId.PrefundPaymasterGas:
+        handleBuildPaymasterGas(props.destinationChain.id);
+        break;
     }
   }, [
     address,
@@ -90,6 +94,13 @@ export default function useTransactionParams(props: UseTransactionParamsProps) {
     props.stepId,
     props.request?.id,
   ]);
+
+  const handleBuildPaymasterGas = (chainId: number) => {
+    buildPaymasterGasCall(chainId).then((res) => {
+      console.log("Paymaster gas res", res);
+      setCalls(res.data.calls);
+    });
+  };
 
   const handleBuildApproveOutbox = (
     tokenAddress: Address,

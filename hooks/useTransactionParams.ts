@@ -5,6 +5,8 @@ import { buildFulfillmentCall } from "@/app/lib/buildFulfillmentCall";
 import { buildMagicSpendCall } from "@/app/lib/buildMagicSpendCall";
 import { buildPaymasterGasCall } from "@/app/lib/buildPaymasterGasCall";
 import { buildShoyuBashiCall } from "@/app/lib/buildShoyuBashiCall";
+import { buildWithdrawGasCall } from "@/app/lib/buildWithdrawGasCall";
+import { buildWithdrawMagicSpendCall } from "@/app/lib/buildWithdrawMagicSpendCall";
 import { StepId } from "@/config/steps";
 import addressToBytes32 from "@/utils/addressToBytes32";
 import { Call } from "@/utils/types/call";
@@ -83,6 +85,16 @@ export default function useTransactionParams(props: UseTransactionParamsProps) {
       case StepId.PrefundPaymasterGas:
         handleBuildPaymasterGas(props.destinationChain.id);
         break;
+      case StepId.RefundMagicSpend:
+        handleBuildRefundMagicSpend(
+          props.destinationChain.id,
+          props.selectedToken.address,
+          address
+        );
+        break;
+      case StepId.RefundGas:
+        handleBuildRefundGas(props.destinationChain.id, address);
+        break;
     }
   }, [
     address,
@@ -94,6 +106,24 @@ export default function useTransactionParams(props: UseTransactionParamsProps) {
     props.stepId,
     props.request?.id,
   ]);
+
+  const handleBuildRefundGas = (chainId: number, address: Address) => {
+    buildWithdrawGasCall(chainId, address).then((res) => {
+      console.log("Build refund gas res", res);
+      setCalls(res.data.calls);
+    });
+  };
+
+  const handleBuildRefundMagicSpend = (
+    chainId: number,
+    token: Address,
+    address: Address
+  ) => {
+    buildWithdrawMagicSpendCall(chainId, token, address).then((res) => {
+      console.log("Build refund magic spend res", res);
+      setCalls(res.data.calls);
+    });
+  };
 
   const handleBuildPaymasterGas = (chainId: number) => {
     buildPaymasterGasCall(chainId).then((res) => {

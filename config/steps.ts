@@ -12,6 +12,8 @@ export enum StepId {
   ApproveOutbox,
   ApprovePaymaster,
   PrefundPaymasterGas,
+  RefundMagicSpend,
+  RefundGas,
 }
 
 const approveOutbox = {
@@ -59,6 +61,16 @@ const claimReward = {
   name: "Claim reward",
   chainTarget: TransactionTarget.SRC,
 };
+const refundMagicSpend = {
+  id: StepId.RefundMagicSpend,
+  name: "Refund Magic Spend",
+  chainTarget: TransactionTarget.DST,
+};
+const refundGas = {
+  id: StepId.RefundGas,
+  name: "Refund Gas",
+  chainTarget: TransactionTarget.DST,
+};
 
 export const steps: Record<RequestType, Record<TokenType, Step[]>> = {
   [RequestType.Standard]: {
@@ -69,6 +81,7 @@ export const steps: Record<RequestType, Record<TokenType, Step[]>> = {
       generateProof,
       submitHashiHeader,
       claimReward,
+      refundMagicSpend,
     ],
     [TokenType.USDC]: [
       approveOutbox,
@@ -79,6 +92,7 @@ export const steps: Record<RequestType, Record<TokenType, Step[]>> = {
       generateProof,
       submitHashiHeader,
       claimReward,
+      refundMagicSpend,
     ],
   },
   [RequestType.SmartAccount]: {
@@ -90,6 +104,8 @@ export const steps: Record<RequestType, Record<TokenType, Step[]>> = {
       generateProof,
       submitHashiHeader,
       claimReward,
+      refundMagicSpend,
+      refundGas,
     ],
     [TokenType.USDC]: [
       approveOutbox,
@@ -101,6 +117,8 @@ export const steps: Record<RequestType, Record<TokenType, Step[]>> = {
       generateProof,
       submitHashiHeader,
       claimReward,
+      refundMagicSpend,
+      refundGas,
     ],
   },
 };

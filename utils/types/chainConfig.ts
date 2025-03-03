@@ -13,6 +13,7 @@ type Contracts = {
   entryPoint: Address;
   shoyuBashi: Address;
   smartAccount: Address;
+  mockAccountTracker: Address;
   outboxContracts: Record<string, Address>;
 };
 

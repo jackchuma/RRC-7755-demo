@@ -15,6 +15,7 @@ export default {
       entryPoint: "0x0000000071727De22E5E9d8BAf0edAc6f37da032",
       shoyuBashi: "0xce8b068D4F7F2eb3bDAFa72eC3C4feE78CF9Ccf7",
       smartAccount: "0xef771D2A339FE480D48Bc5A47e252a48235A1B88",
+      mockAccountTracker: "0x01c6f1E3Ab5AC6e54C8fFD87A89967b599ca9c04",
       outboxContracts: {
         Hashi: "0x0db4a95368675b8ab0d25a564205df1ec9494ebf",
       },
@@ -39,6 +40,7 @@ export default {
       entryPoint: "0x0000000071727De22E5E9d8BAf0edAc6f37da032",
       shoyuBashi: "0x6602dc9b6bd964C2a11BBdA9B2275308D1Bbc14f",
       smartAccount: "0xef771D2A339FE480D48Bc5A47e252a48235A1B88",
+      mockAccountTracker: "0x01c6f1E3Ab5AC6e54C8fFD87A89967b599ca9c04",
       outboxContracts: {
         Arbitrum: "0x900539218b3458915963685cfb99c1a62077239c",
         OPStack: "0x08448686a799403989cc36388de95cc05b049cf0",
@@ -66,6 +68,7 @@ export default {
       entryPoint: "0x0000000071727De22E5E9d8BAf0edAc6f37da032",
       shoyuBashi: "0x7237bb8d1d38DF8b473b5A38eD90088AF162ad8e",
       smartAccount: "0xef771D2A339FE480D48Bc5A47e252a48235A1B88",
+      mockAccountTracker: "0x01c6f1E3Ab5AC6e54C8fFD87A89967b599ca9c04",
       outboxContracts: {
         Arbitrum: "0x3179470e16cd6514b3bd4df246cf08d70e87ea70",
         OPStack: "0xbbe8887743df87db43626df0733503779c5a330d",

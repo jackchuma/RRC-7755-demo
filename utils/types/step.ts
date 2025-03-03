@@ -8,4 +8,5 @@ export type Step = {
   id: number;
   name: string;
   chainTarget: TransactionTarget;
+  description: string;
 };

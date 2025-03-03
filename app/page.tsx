@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 
-import ChainVisualizer from "../components/ChainVisualizer";
 import StepVisualizer from "../components/StepVisualizer";
 import WalletConnection from "../components/WalletConnection";
 import Selector from "../components/Selector";
@@ -14,6 +13,7 @@ import { ProofType } from "@/utils/types/proof";
 import useBalance from "@/hooks/useBalance";
 import { tokens } from "@/config/tokens";
 import AddressInput from "@/components/AddressInput";
+import BalancesPanel from "@/components/BalancesPanel";
 
 const chains = [
   { id: 84532, name: "Base Sepolia", icon: "🔷" },
@@ -41,8 +41,11 @@ export default function Home() {
   const [selectedToken, setSelectedToken] = useState(tokens[0]);
   const [amount, setAmount] = useState("");
 
-  const sourceChainBalance = useBalance({ chainId: sourceChain.id });
-  const destinationChainBalance = useBalance({ chainId: destinationChain.id });
+  const sourceChainBalances = useBalance(sourceChain.id, selectedToken);
+  const destinationChainBalances = useBalance(
+    destinationChain.id,
+    selectedToken
+  );
 
   const handleNextStep = () => {
     const maxSteps = steps[requestType.id][selectedToken.id].length;
@@ -90,24 +93,37 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[#101218] text-white p-8">
-      <h1 className="text-4xl font-bold text-center mb-8">RRC-7755 Demo</h1>
-      <WalletConnection />
+      <div className="relative">
+        <h1 className="text-4xl font-bold text-center mb-8">RRC-7755 Demo</h1>
+        <WalletConnection />
+      </div>
+      <BalancesPanel
+        sourceChain={sourceChain}
+        destinationChain={destinationChain}
+        token={selectedToken}
+        sourceBalances={sourceChainBalances}
+        destinationBalances={destinationChainBalances}
+        currentStep={currentStep}
+        chains={chains}
+        handleSourceChainChange={handleSourceChainChange}
+        handleDestinationChainChange={handleDestinationChainChange}
+      />
       <div className="flex flex-col lg:flex-row justify-between items-start mt-8">
+        <StepVisualizer
+          steps={steps[requestType.id][selectedToken.id]}
+          currentStep={currentStep}
+          onNextStep={handleNextStep}
+          sourceChain={sourceChain}
+          destinationChain={destinationChain}
+          requestType={requestType.id as RequestType}
+          selectedToken={selectedToken}
+          amount={+amount}
+          request={request}
+          setRequest={handleSetRequest}
+          proof={proof}
+          setProof={handleSetProof}
+        />
         <div className="w-full lg:w-1/4">
-          <Selector
-            items={chains}
-            selected={sourceChain}
-            onChange={handleSourceChainChange}
-            label="Source Chain"
-            displayIcon={true}
-            disabled={currentStep > 0}
-          />
-          <ChainVisualizer
-            chain={sourceChain}
-            balance={sourceChainBalance}
-            isSource={true}
-            currentStep={currentStep}
-          />
           <Selector
             items={requests}
             selected={requestType}
@@ -127,43 +143,13 @@ export default function Home() {
           <AmountInput
             amount={amount}
             onAmountChange={handleAmountChange}
-            maxAmount={sourceChainBalance[selectedToken.id]}
+            maxAmount={sourceChainBalances.account}
             disabled={currentStep > 0}
           />
           <AddressInput
             destinationAddress={destinationAddress}
             onDestinationAddressChange={handleDestinationAddressChange}
             disabled={currentStep > 0}
-          />
-        </div>
-        <StepVisualizer
-          steps={steps[requestType.id][selectedToken.id]}
-          currentStep={currentStep}
-          onNextStep={handleNextStep}
-          sourceChain={sourceChain}
-          destinationChain={destinationChain}
-          requestType={requestType.id as RequestType}
-          selectedToken={selectedToken}
-          amount={+amount}
-          request={request}
-          setRequest={handleSetRequest}
-          proof={proof}
-          setProof={handleSetProof}
-        />
-        <div className="w-full lg:w-1/4">
-          <Selector
-            items={chains}
-            selected={destinationChain}
-            onChange={handleDestinationChainChange}
-            label="Destination Chain"
-            displayIcon={true}
-            disabled={currentStep > 0}
-          />
-          <ChainVisualizer
-            chain={destinationChain}
-            balance={destinationChainBalance}
-            isSource={false}
-            currentStep={currentStep}
           />
         </div>
       </div>

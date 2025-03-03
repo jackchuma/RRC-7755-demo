@@ -1,32 +1,30 @@
-import { getBalance } from "@/app/lib/getBalance";
-import { Balance } from "@/utils/types/balance";
-import { TokenType } from "@/utils/types/tokenType";
+import { Balances, getBalances } from "@/app/lib/getBalances";
+import { Token } from "@/utils/types/tokenType";
 import { useEffect, useState } from "react";
 import { useAccount } from "wagmi";
 
-interface UseBalanceProps {
-  chainId: number;
-}
-
-export default function useBalance(props: UseBalanceProps) {
+export default function useBalance(chainId: number, token: Token) {
   const { address } = useAccount();
 
-  const [balance, setBalance] = useState<Balance>({
-    [TokenType.ETH]: 0,
-    [TokenType.USDC]: 0,
+  const [balance, setBalance] = useState<Balances>({
+    account: 0,
+    fulfiller: 0,
+    outbox: 0,
+    paymaster: 0,
+    entryPoint: 0,
   });
 
   useEffect(() => {
     if (!address) return;
 
     const intervalId = setInterval(() => {
-      getBalance(address, props.chainId).then((res) => {
-        setBalance(res.data.balance);
+      getBalances(chainId, token, address).then((res) => {
+        setBalance(res.data.balances);
       });
     }, 10000);
 
     return () => clearInterval(intervalId);
-  }, [address, props.chainId]);
+  }, [address, chainId, token.id]);
 
   return balance;
 }

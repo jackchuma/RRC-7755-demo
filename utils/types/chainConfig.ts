@@ -18,7 +18,6 @@ type Contracts = {
 
 export type ChainConfig = {
   chainId: number;
-  rpcUrl: string;
   l2Oracle: Address;
   l2OracleStorageKey: Address;
   publicClient: any;
@@ -26,6 +25,4 @@ export type ChainConfig = {
   targetProver: Provers;
   exposesL1State: boolean;
   sharesStateWithL1: boolean;
-  etherscanApiKey: string;
-  etherscanApiUrl: string;
 };

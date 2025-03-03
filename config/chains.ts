@@ -5,8 +5,7 @@ import { ChainConfig, Provers } from "../utils/types/chainConfig";
 export default {
   // Arbitrum Sepolia
   421614: {
-    chainId: 421614,
-    rpcUrl: arbitrumSepolia.rpcUrls.default.http[0],
+    chainId: arbitrumSepolia.id,
     l2Oracle: "0x042B2E6C5E99d4c521bd49beeD5E99651D9B0Cf4",
     l2OracleStorageKey:
       "0x0000000000000000000000000000000000000000000000000000000000000076",
@@ -27,13 +26,10 @@ export default {
     targetProver: Provers.Arbitrum,
     exposesL1State: false,
     sharesStateWithL1: true,
-    etherscanApiKey: process.env.ARBISCAN_API_KEY,
-    etherscanApiUrl: "https://api-sepolia.arbiscan.io",
   },
   // Base Sepolia
   84532: {
-    chainId: 84532,
-    rpcUrl: baseSepolia.rpcUrls.default.http[0],
+    chainId: baseSepolia.id,
     l2Oracle: "0x4C8BA32A5DAC2A720bb35CeDB51D6B067D104205",
     l2OracleStorageKey:
       "0xa6eef7e35abe7026729641147f7915573c7e97b47efa546f5f6e3230263bcb49",
@@ -56,13 +52,10 @@ export default {
     targetProver: Provers.OPStack,
     exposesL1State: true,
     sharesStateWithL1: true,
-    etherscanApiKey: process.env.BASESCAN_API_KEY,
-    etherscanApiUrl: "https://api-sepolia.basescan.org",
   },
   // Optimism Sepolia
   11155420: {
-    chainId: 11155420,
-    rpcUrl: optimismSepolia.rpcUrls.default.http[0],
+    chainId: optimismSepolia.id,
     l2Oracle: "0x218CD9489199F321E1177b56385d333c5B598629",
     l2OracleStorageKey:
       "0xa6eef7e35abe7026729641147f7915573c7e97b47efa546f5f6e3230263bcb49",
@@ -86,7 +79,5 @@ export default {
     targetProver: Provers.OPStack,
     exposesL1State: true,
     sharesStateWithL1: true,
-    etherscanApiKey: process.env.OPTIMISM_API_KEY,
-    etherscanApiUrl: "https://api-sepolia-optimistic.etherscan.io",
   },
 } as Record<number, ChainConfig>;

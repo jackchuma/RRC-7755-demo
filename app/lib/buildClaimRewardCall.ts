@@ -4,6 +4,7 @@ import HashiProof from "@/abis/HashiProof";
 import Outbox from "@/abis/Outbox";
 import bytes32ToAddress from "@/utils/bytes32ToAddress";
 import { isHashiProofType } from "@/utils/isHashiProofType";
+import { BuildCallsResponse } from "@/utils/types/buildCallsReponse";
 import { Call } from "@/utils/types/call";
 import { ProofType } from "@/utils/types/proof";
 import { Request } from "@/utils/types/request";
@@ -14,16 +15,11 @@ import {
   encodeFunctionData,
 } from "viem";
 
-export type BuildClaimRewardCallResponse = {
-  success: boolean;
-  data: { calls: Call[] };
-};
-
 export async function buildClaimRewardCall(
   req: Request,
   proof: ProofType,
   address: Address
-): Promise<BuildClaimRewardCallResponse> {
+): Promise<BuildCallsResponse> {
   console.log("buildClaimRewardCall");
   const encodedProof = encodeProof(proof);
   const calls: Call[] = [

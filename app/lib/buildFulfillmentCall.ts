@@ -2,19 +2,15 @@
 
 import Inbox from "@/abis/Inbox";
 import bytes32ToAddress from "@/utils/bytes32ToAddress";
+import { BuildCallsResponse } from "@/utils/types/buildCallsReponse";
 import { Call } from "@/utils/types/call";
 import { Request } from "@/utils/types/request";
 import { Address, encodeFunctionData } from "viem";
 
-export type BuildFulfillmentCallResponse = {
-  success: boolean;
-  data: { calls: Call[] };
-};
-
 export async function buildFulfillmentCall(
   req: Request,
   address: Address
-): Promise<BuildFulfillmentCallResponse> {
+): Promise<BuildCallsResponse> {
   console.log("buildFulfillmentCall");
   const args: any = [
     req.srcChain,
@@ -27,12 +23,8 @@ export async function buildFulfillmentCall(
   const calls: Call[] = [
     {
       to: bytes32ToAddress(req.receiver),
-      data: encodeFunctionData({
-        abi: Inbox,
-        functionName: "fulfill",
-        args,
-      }),
-      value: req.dstValue,
+      data: encodeFunctionData({ abi: Inbox, functionName: "fulfill", args }),
+      value: BigInt(0),
     },
   ];
 

@@ -9,6 +9,8 @@ const nonceAttributeSelector = "0xce03fdab";
 const requesterAttributeSelector = "0x3bd94e4c";
 const shoyuBashiAttributeSelector = "0xda07e15d";
 const destinationChainSelector = "0xdff49bf1";
+const magicSpendRequestSelector = "0x92041278";
+const inboxAttributeSelector = "0xbd362374";
 
 export default class Attributes {
   private attributes: Hex[];
@@ -64,6 +66,21 @@ export default class Attributes {
   addDestinationChainId(dstChainId: number): void {
     this.attributes.push(
       `${destinationChainSelector}${toHex(dstChainId, { size: 32 }).slice(2)}`
+    );
+  }
+
+  addMagicSpendRequest(token: Address, amount: bigint): void {
+    this.attributes.push(
+      `${magicSpendRequestSelector}${addressToBytes32(token).slice(2)}${toHex(
+        amount,
+        { size: 32 }
+      ).slice(2)}`
+    );
+  }
+
+  addInbox(inbox: Address): void {
+    this.attributes.push(
+      `${inboxAttributeSelector}${addressToBytes32(inbox).slice(2)}`
     );
   }
 

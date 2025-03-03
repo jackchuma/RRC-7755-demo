@@ -18,6 +18,7 @@ import ProofVisualizer from "./ProofVisualizer";
 import { ProofType } from "@/utils/types/proof";
 import { generateProof } from "@/app/lib/generateProof";
 import { sepolia } from "viem/chains";
+import { StepId } from "@/config/steps";
 
 interface StepVisualizerProps {
   steps: Step[];
@@ -49,7 +50,7 @@ export default function StepVisualizer({
   setProof,
 }: StepVisualizerProps) {
   const { calls } = useTransactionParams({
-    currentStep,
+    stepId: steps[currentStep].id,
     sourceChain,
     destinationChain,
     requestType,
@@ -151,7 +152,7 @@ export default function StepVisualizer({
                   {sourceChain.icon} {sourceChain.name} →{" "}
                   {destinationChain.icon} {destinationChain.name}
                 </p>
-                {currentStep === 2 && (
+                {step.id === StepId.GenerateProof && (
                   <>
                     {proof ? (
                       <>

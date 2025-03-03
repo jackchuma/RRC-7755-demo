@@ -25,10 +25,11 @@ import chains from "@/config/chains";
 import Attributes from "@/utils/attributes";
 import { nativeAssetAddress } from "@/utils/constants";
 import { Call } from "@/utils/types/call";
+import { calculateRewardAmount } from "@/utils/calculateRewardAmount";
 
 export type BuildTransactionResponse = {
   success: boolean;
-  data: { id: Hex; calls: Call[]; args: any; dstValue: bigint };
+  data: { id: Hex; calls: Call[]; args: any };
 };
 
 export async function buildTransaction(
@@ -72,7 +73,8 @@ export async function buildTransaction(
     srcChain.contracts.shoyuBashi,
     sourceChainId,
     dstChainId,
-    outboxName
+    outboxName,
+    requestType
   );
   const payload = await buildPayload(
     requestType,
@@ -114,13 +116,11 @@ export async function buildTransaction(
         functionName: "sendMessage",
         args,
       }),
-      value,
+      value: token.id === TokenType.ETH ? value : BigInt(0),
     },
   ];
-  const dstValue =
-    token.id === TokenType.ETH ? parseEther(amount.toString()) : BigInt(0);
 
-  return { success: true, data: { id, calls, args, dstValue } };
+  return { success: true, data: { id, calls, args } };
 }
 
 async function buildPayload(
@@ -172,20 +172,17 @@ async function buildAttributes(
   shoyuBashi: Address,
   srcChainId: number,
   dstChainId: number,
-  outbox: string
+  outbox: string,
+  requestType: RequestType
 ): Promise<{ attributes: Hex[]; value: bigint }> {
   console.log("Building attributes");
   const attributes = new Attributes();
 
   // reward
-  const asset = nativeAssetAddress;
-  let rewardAmount = amount * 1.02; // 2% fee
-  if (token.id === TokenType.USDC) {
-    const usdPerEth = await getUsdPerEth();
-    rewardAmount /= usdPerEth;
-  }
+  const asset = token.address;
+  const rewardAmount = calculateRewardAmount(amount);
   const value = parseEther(rewardAmount.toString());
-  attributes.addReward(asset, value);
+  attributes.addReward(addressToBytes32(asset), value);
 
   // delay
   attributes.addDelay(finalityDelay, Math.floor(Date.now() / 1000) + 1_209_600); // 2 weeks to expiry
@@ -207,6 +204,12 @@ async function buildAttributes(
     // l2Oracle
     attributes.addL2Oracle(l2Oracle);
   }
+
+  if (requestType === RequestType.SmartAccount) {
+    attributes.addInbox(chains[dstChainId].contracts.inbox);
+  }
+
+  attributes.addMagicSpendRequest(token.address, parseEther(amount.toString()));
 
   return { attributes: attributes.list(), value };
 }

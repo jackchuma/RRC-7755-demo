@@ -45,7 +45,7 @@ export default function Home() {
   const destinationChainBalance = useBalance({ chainId: destinationChain.id });
 
   const handleNextStep = () => {
-    const maxSteps = steps.length;
+    const maxSteps = steps[selectedToken.id].length;
     if (currentStep < maxSteps - 1) {
       setCurrentStep((prev) => prev + 1);
     }
@@ -137,7 +137,7 @@ export default function Home() {
           />
         </div>
         <StepVisualizer
-          steps={steps}
+          steps={steps[selectedToken.id]}
           currentStep={currentStep}
           onNextStep={handleNextStep}
           sourceChain={sourceChain}

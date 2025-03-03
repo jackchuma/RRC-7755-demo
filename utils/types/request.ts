@@ -14,5 +14,4 @@ export type Request = {
   payload: Hex;
   attributes: Hex[];
   requestType: RequestType;
-  dstValue: bigint;
 };

@@ -1,7 +1,10 @@
 import { buildTransaction, BuildTransactionResponse } from "@/app/lib/actions";
+import { buildApproveCall } from "@/app/lib/buildApproveCall";
 import { buildClaimRewardCall } from "@/app/lib/buildClaimRewardCall";
 import { buildFulfillmentCall } from "@/app/lib/buildFulfillmentCall";
+import { buildMagicSpendCall } from "@/app/lib/buildMagicSpendCall";
 import { buildShoyuBashiCall } from "@/app/lib/buildShoyuBashiCall";
+import { StepId } from "@/config/steps";
 import addressToBytes32 from "@/utils/addressToBytes32";
 import { Call } from "@/utils/types/call";
 import { ProofType } from "@/utils/types/proof";
@@ -13,7 +16,7 @@ import { Address, toHex, zeroAddress } from "viem";
 import { useAccount } from "wagmi";
 
 interface UseTransactionParamsProps {
-  currentStep: number;
+  stepId: StepId;
   sourceChain: SelectionItem;
   destinationChain: SelectionItem;
   requestType: RequestType;
@@ -35,8 +38,15 @@ export default function useTransactionParams(props: UseTransactionParamsProps) {
 
   useEffect(() => {
     setCalls([]);
-    switch (props.currentStep) {
-      case 0:
+    switch (props.stepId) {
+      case StepId.PreFundPaymaster:
+        handlePrefundPaymaster(
+          props.destinationChain.id,
+          props.selectedToken,
+          props.amount
+        );
+        break;
+      case StepId.SubmitRequest:
         handleBuildSubmission(
           address,
           props.amount,
@@ -46,14 +56,28 @@ export default function useTransactionParams(props: UseTransactionParamsProps) {
           props.selectedToken
         );
         break;
-      case 1:
+      case StepId.FulfillRequest:
         handleBuildFulfillment(props.request);
         break;
-      case 3:
+      case StepId.SubmitHashiHeader:
         handleBuildShoyuBashiCall(props.request);
         break;
-      case 4:
+      case StepId.ClaimReward:
         handleBuildClaimRewardCall(address, props.request);
+        break;
+      case StepId.ApproveOutbox:
+        handleBuildApproveOutbox(
+          props.selectedToken.address,
+          props.sourceChain.id,
+          props.amount
+        );
+        break;
+      case StepId.ApprovePaymaster:
+        handleBuildApprovePaymaster(
+          props.selectedToken.address,
+          props.destinationChain.id,
+          props.amount
+        );
         break;
     }
   }, [
@@ -63,9 +87,54 @@ export default function useTransactionParams(props: UseTransactionParamsProps) {
     props.destinationChain.id,
     props.requestType,
     props.selectedToken.id,
-    props.currentStep,
+    props.stepId,
     props.request?.id,
   ]);
+
+  const handleBuildApproveOutbox = (
+    tokenAddress: Address,
+    srcChainId: number,
+    amount: number
+  ) => {
+    if (amount > 0) {
+      buildApproveCall(tokenAddress, srcChainId, true, amount, true).then(
+        (res) => {
+          console.log("Approve res", res);
+          setCalls(res.data.calls);
+        }
+      );
+    }
+  };
+
+  const handleBuildApprovePaymaster = (
+    tokenAddress: Address,
+    dstChainId: number,
+    amount: number
+  ) => {
+    if (amount > 0) {
+      buildApproveCall(tokenAddress, dstChainId, false, amount, false).then(
+        (res) => {
+          console.log("Approve res", res);
+          setCalls(res.data.calls);
+        }
+      );
+    }
+  };
+
+  const handlePrefundPaymaster = (
+    dstChainId: number,
+    token: Token,
+    amount: number
+  ) => {
+    if (amount > 0) {
+      buildMagicSpendCall(dstChainId, token, amount).then((res) => {
+        console.log("Magic Spend res", res);
+        setCalls(res.data.calls);
+      });
+    } else {
+      setCalls([]);
+    }
+  };
 
   const handleBuildSubmission = (
     addr: Address,
@@ -151,7 +220,6 @@ export default function useTransactionParams(props: UseTransactionParamsProps) {
         payload,
         attributes,
         requestType,
-        dstValue: res.data.dstValue,
       };
       props.setRequest(req);
     }

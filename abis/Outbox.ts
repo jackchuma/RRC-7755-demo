@@ -346,6 +346,25 @@ export default [
   },
   {
     type: "function",
+    name: "getRequiredAttributes",
+    inputs: [
+      {
+        name: "isUserOp",
+        type: "bool",
+        internalType: "bool",
+      },
+    ],
+    outputs: [
+      {
+        name: "",
+        type: "bytes4[]",
+        internalType: "bytes4[]",
+      },
+    ],
+    stateMutability: "pure",
+  },
+  {
+    type: "function",
     name: "getUserOpAttributes",
     inputs: [
       {
@@ -496,11 +515,6 @@ export default [
         internalType: "bytes",
       },
       {
-        name: "inbox",
-        type: "address",
-        internalType: "address",
-      },
-      {
         name: "attributes",
         type: "bytes[]",
         internalType: "bytes[]",
@@ -543,6 +557,11 @@ export default [
         name: "value",
         type: "uint256",
         internalType: "uint256",
+      },
+      {
+        name: "requireInbox",
+        type: "bool",
+        internalType: "bool",
       },
     ],
     outputs: [],

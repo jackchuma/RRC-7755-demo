@@ -8,6 +8,7 @@ export enum Provers {
 
 type Contracts = {
   l2MessagePasser?: Address;
+  paymaster: Address;
   inbox: Address;
   entryPoint: Address;
   shoyuBashi: Address;

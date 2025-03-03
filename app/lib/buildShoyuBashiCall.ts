@@ -5,8 +5,9 @@ import Attributes from "@/utils/attributes";
 import decodeUserOp from "@/utils/decodeUserOp";
 import extractAttributesFromUserOp from "@/utils/extractAttributesFromUserOp";
 import { isHashiProofType } from "@/utils/isHashiProofType";
+import { BuildCallsResponse } from "@/utils/types/buildCallsReponse";
 import { Call } from "@/utils/types/call";
-import { HashiProofType, ProofType } from "@/utils/types/proof";
+import { ProofType } from "@/utils/types/proof";
 import { Request, RequestType } from "@/utils/types/request";
 import {
   decodeAbiParameters,
@@ -16,15 +17,10 @@ import {
   keccak256,
 } from "viem";
 
-export type BuildShoyuBashiCallResponse = {
-  success: boolean;
-  data: { calls: Call[] };
-};
-
 export async function buildShoyuBashiCall(
   req: Request,
   proof: ProofType
-): Promise<BuildShoyuBashiCallResponse> {
+): Promise<BuildCallsResponse> {
   console.log("buildShoyuBashiCall");
   const [dstChainId] = decodeAbiParameters([{ type: "uint256" }], req.dstChain);
   let attributes = new Attributes(req.attributes);

@@ -23,7 +23,7 @@ export default function useBalance(props: UseBalanceProps) {
       getBalance(address, props.chainId).then((res) => {
         setBalance(res.data.balance);
       });
-    }, 3000);
+    }, 10000);
 
     return () => clearInterval(intervalId);
   }, [address, props.chainId]);

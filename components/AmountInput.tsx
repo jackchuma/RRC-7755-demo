@@ -52,7 +52,7 @@ export default function AmountInput({
           type="button"
           onClick={handleSetMax}
           disabled={disabled}
-          className={`absolute right-2 top-1/2 -translate-y-1/2 text-xs font-medium px-2 py-1 rounded bg-primary/20 text-primary-foreground transition-all ${
+          className={`absolute right-8 top-1/2 -translate-y-1/2 text-xs font-medium px-2 py-1 rounded bg-primary/20 text-primary-foreground transition-all ${
             disabled
               ? "opacity-50 cursor-not-allowed"
               : "hover:bg-primary/30 active:scale-95"

@@ -150,28 +150,24 @@ export default function Home() {
       label: "Withdraw from Paymaster",
       action: handleRefundMagicSpend,
       calls: handleRefundMagicSpend,
-      isTransaction: true,
       chainId: destinationChain.id,
     },
     {
       label: "Withdraw from EntryPoint",
       action: handleRefundGas,
       calls: handleRefundGas,
-      isTransaction: true,
       chainId: destinationChain.id,
     },
     {
       label: "Withdraw from Account",
       action: handleRefundAccount,
       calls: handleRefundAccount,
-      isTransaction: true,
       chainId: sourceChain.id,
     },
     {
       label: "Reset",
       action: handleReset,
       calls: async () => [],
-      isTransaction: false,
       chainId: 0,
     },
   ];

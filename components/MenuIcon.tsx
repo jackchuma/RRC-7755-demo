@@ -9,7 +9,6 @@ interface MenuOption {
   label: string;
   action: () => void;
   calls: () => Promise<Call[]>;
-  isTransaction: boolean;
   chainId: number;
 }
 
@@ -70,7 +69,7 @@ const MenuIcon: React.FC<MenuIconProps> = ({ options }) => {
       {isOpen && (
         <div className="absolute top-12 left-0 w-48 bg-gradient-to-br from-indigo-800 to-purple-900 rounded-md shadow-xl py-1 mt-2 border border-indigo-500/30 backdrop-blur-sm">
           {options.map((option, index) =>
-            option.isTransaction ? (
+            option.chainId !== 0 ? (
               <Transaction
                 chainId={option.chainId}
                 calls={option.calls}

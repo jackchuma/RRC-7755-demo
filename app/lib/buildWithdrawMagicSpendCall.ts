@@ -2,15 +2,19 @@
 
 import Paymaster from "@/abis/Paymaster";
 import chains from "@/config/chains";
-import { BuildCallsResponse } from "@/utils/types/buildCallsReponse";
 import { Call } from "@/utils/types/call";
-import { Address, encodeFunctionData } from "viem";
+import { Address, encodeFunctionData, formatEther } from "viem";
+
+type WithdrawMagicSpendCallResponse = {
+  success: boolean;
+  data: { calls: Call[]; amount: number };
+};
 
 export async function buildWithdrawMagicSpendCall(
   chainId: number,
   token: Address,
   address: Address
-): Promise<BuildCallsResponse> {
+): Promise<WithdrawMagicSpendCallResponse> {
   const chainConfig = chains[chainId];
 
   const amount = await chainConfig.publicClient.readContract({
@@ -32,5 +36,5 @@ export async function buildWithdrawMagicSpendCall(
     },
   ];
 
-  return { success: true, data: { calls } };
+  return { success: true, data: { calls, amount: +formatEther(amount) } };
 }

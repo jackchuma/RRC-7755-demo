@@ -6,6 +6,7 @@ import StepVisualizer from "../components/StepVisualizer";
 import WalletConnection from "../components/WalletConnection";
 import Selector from "../components/Selector";
 import AmountInput from "../components/AmountInput";
+import MenuIcon from "../components/MenuIcon";
 import { Request, RequestType } from "@/utils/types/request";
 import { TokenType } from "@/utils/types/tokenType";
 import { steps } from "@/config/steps";
@@ -13,6 +14,10 @@ import { ProofType } from "@/utils/types/proof";
 import useBalance from "@/hooks/useBalance";
 import { tokens } from "@/config/tokens";
 import BalancesPanel from "@/components/BalancesPanel";
+import { buildWithdrawMagicSpendCall } from "./lib/buildWithdrawMagicSpendCall";
+import { useAccount } from "wagmi";
+import { Call } from "@/utils/types/call";
+import { buildWithdrawGasCall } from "./lib/buildWithdrawGasCall";
 
 const chains = [
   { id: 84532, name: "Base Sepolia", icon: "🔷" },
@@ -30,6 +35,7 @@ const requests = [
 ];
 
 export default function Home() {
+  const { address } = useAccount();
   const [currentStep, setCurrentStep] = useState(0);
   const [sourceChain, setSourceChain] = useState(chains[2]);
   const [destinationChain, setDestinationChain] = useState(chains[0]);
@@ -85,9 +91,68 @@ export default function Home() {
     setProof(p);
   };
 
+  const handleRefundMagicSpend = async (): Promise<Call[]> => {
+    console.log("Refund magic spend action triggered");
+    if (!address) {
+      console.error("No address found");
+      return [];
+    }
+
+    const res = await buildWithdrawMagicSpendCall(
+      destinationChain.id,
+      selectedToken.address,
+      address
+    );
+    console.log(res);
+    return res.data.amount > 0 ? res.data.calls : [];
+  };
+
+  const handleRefundGas = async (): Promise<Call[]> => {
+    console.log("Refund gas action triggered");
+    if (!address) {
+      console.error("No address found");
+      return [];
+    }
+
+    const res = await buildWithdrawGasCall(destinationChain.id, address);
+    console.log(res);
+    return res.data.amount > 0 ? res.data.calls : [];
+  };
+
+  const handleReset = () => {
+    console.log("Reset action triggered");
+    setCurrentStep(0);
+    setRequest(undefined);
+    setProof(undefined);
+    setAmount("");
+  };
+
+  // Menu options
+  const menuOptions = [
+    {
+      label: "Refund Magic Spend",
+      action: handleRefundMagicSpend,
+      calls: async () => [],
+      isTransaction: true,
+    },
+    {
+      label: "Refund Gas",
+      action: handleRefundGas,
+      calls: handleRefundGas,
+      isTransaction: true,
+    },
+    {
+      label: "Reset",
+      action: handleReset,
+      calls: async () => [],
+      isTransaction: false,
+    },
+  ];
+
   return (
     <div className="min-h-screen bg-[#101218] text-white p-8">
       <div className="relative">
+        <MenuIcon options={menuOptions} dstChainId={destinationChain.id} />
         <h1 className="text-4xl font-bold text-center mb-8">RRC-7755 Demo</h1>
         <WalletConnection />
       </div>

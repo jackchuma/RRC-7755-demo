@@ -10,14 +10,14 @@ interface MenuOption {
   action: () => void;
   calls: () => Promise<Call[]>;
   isTransaction: boolean;
+  chainId: number;
 }
 
 interface MenuIconProps {
   options: MenuOption[];
-  dstChainId: number;
 }
 
-const MenuIcon: React.FC<MenuIconProps> = ({ options, dstChainId }) => {
+const MenuIcon: React.FC<MenuIconProps> = ({ options }) => {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -72,7 +72,7 @@ const MenuIcon: React.FC<MenuIconProps> = ({ options, dstChainId }) => {
           {options.map((option, index) =>
             option.isTransaction ? (
               <Transaction
-                chainId={dstChainId}
+                chainId={option.chainId}
                 calls={option.calls}
                 onSuccess={() => setIsOpen(false)}
               >

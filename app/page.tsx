@@ -18,6 +18,7 @@ import { buildWithdrawMagicSpendCall } from "./lib/buildWithdrawMagicSpendCall";
 import { useAccount } from "wagmi";
 import { Call } from "@/utils/types/call";
 import { buildWithdrawGasCall } from "./lib/buildWithdrawGasCall";
+import { buildWithdrawAccountCall } from "./lib/buildWithdrawAccountCall";
 
 const chains = [
   { id: 84532, name: "Base Sepolia", icon: "🔷" },
@@ -119,6 +120,22 @@ export default function Home() {
     return res.data.amount > 0 ? res.data.calls : [];
   };
 
+  const handleRefundAccount = async (): Promise<Call[]> => {
+    console.log("Refund account action triggered");
+    if (!address) {
+      console.error("No address found");
+      return [];
+    }
+
+    const res = await buildWithdrawAccountCall(
+      sourceChain.id,
+      address,
+      selectedToken.address
+    );
+    console.log(res);
+    return res.data.amount > 0 ? res.data.calls : [];
+  };
+
   const handleReset = () => {
     console.log("Reset action triggered");
     setCurrentStep(0);
@@ -130,22 +147,32 @@ export default function Home() {
   // Menu options
   const menuOptions = [
     {
-      label: "Refund Magic Spend",
+      label: "Withdraw from Paymaster",
       action: handleRefundMagicSpend,
       calls: handleRefundMagicSpend,
       isTransaction: true,
+      chainId: destinationChain.id,
     },
     {
-      label: "Refund Gas",
+      label: "Withdraw from EntryPoint",
       action: handleRefundGas,
       calls: handleRefundGas,
       isTransaction: true,
+      chainId: destinationChain.id,
+    },
+    {
+      label: "Withdraw from Account",
+      action: handleRefundAccount,
+      calls: handleRefundAccount,
+      isTransaction: true,
+      chainId: sourceChain.id,
     },
     {
       label: "Reset",
       action: handleReset,
       calls: async () => [],
       isTransaction: false,
+      chainId: 0,
     },
   ];
 
@@ -154,7 +181,7 @@ export default function Home() {
       <div className="max-w-7xl mx-auto">
         <div className="relative flex items-center justify-between mb-8">
           <div className="absolute right-0 top-0">
-            <MenuIcon options={menuOptions} dstChainId={destinationChain.id} />
+            <MenuIcon options={menuOptions} />
           </div>
           <div className="w-full">
             <h1 className="text-4xl font-bold text-center mb-2 gradient-text">

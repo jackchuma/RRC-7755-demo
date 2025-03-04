@@ -10,13 +10,13 @@ import { Address, encodeFunctionData, parseEther } from "viem";
 export async function buildApproveCall(
   tokenAddress: Address,
   chainId: number,
-  approveOutbox: boolean,
+  approveAccount: boolean,
   amount: number,
   calcReward: boolean
 ): Promise<BuildCallsResponse> {
   const { contracts } = chains[chainId];
-  const addr = approveOutbox
-    ? contracts.outboxContracts.Hashi
+  const addr = approveAccount
+    ? contracts.mockAccountTracker
     : contracts.paymaster;
   const amountToApprove = calcReward ? calculateRewardAmount(amount) : amount;
   const calls: Call[] = [

@@ -8,11 +8,8 @@ import { buildFulfillmentCall } from "@/app/lib/buildFulfillmentCall";
 import { buildMagicSpendCall } from "@/app/lib/buildMagicSpendCall";
 import { buildPaymasterGasCall } from "@/app/lib/buildPaymasterGasCall";
 import { buildShoyuBashiCall } from "@/app/lib/buildShoyuBashiCall";
-import { buildWithdrawGasCall } from "@/app/lib/buildWithdrawGasCall";
-import { buildWithdrawMagicSpendCall } from "@/app/lib/buildWithdrawMagicSpendCall";
 import { buildFundMockAccountCall } from "@/app/lib/fundMockAccount";
 import { StepId } from "@/config/steps";
-import addressToBytes32 from "@/utils/addressToBytes32";
 import { Call } from "@/utils/types/call";
 import { ProofType } from "@/utils/types/proof";
 import { Request, RequestType } from "@/utils/types/request";
@@ -72,8 +69,8 @@ export default function useTransactionParams(props: UseTransactionParamsProps) {
       case StepId.ClaimReward:
         handleBuildClaimRewardCall(address, props.request);
         break;
-      case StepId.ApproveOutbox:
-        handleBuildApproveOutbox(
+      case StepId.ApproveAccount:
+        handleBuildApproveAccount(
           props.selectedToken.address,
           props.sourceChain.id,
           props.amount
@@ -88,16 +85,6 @@ export default function useTransactionParams(props: UseTransactionParamsProps) {
         break;
       case StepId.PrefundPaymasterGas:
         handleBuildPaymasterGas(props.destinationChain.id);
-        break;
-      case StepId.RefundMagicSpend:
-        handleBuildRefundMagicSpend(
-          props.destinationChain.id,
-          props.selectedToken.address,
-          address
-        );
-        break;
-      case StepId.RefundGas:
-        handleBuildRefundGas(props.destinationChain.id, address);
         break;
       case StepId.PrefundAccount:
         handleBuildPrefundAccount(
@@ -131,24 +118,6 @@ export default function useTransactionParams(props: UseTransactionParamsProps) {
     }
   };
 
-  const handleBuildRefundGas = (chainId: number, address: Address) => {
-    buildWithdrawGasCall(chainId, address).then((res) => {
-      console.log("Build refund gas res", res);
-      setCalls(res.data.calls);
-    });
-  };
-
-  const handleBuildRefundMagicSpend = (
-    chainId: number,
-    token: Address,
-    address: Address
-  ) => {
-    buildWithdrawMagicSpendCall(chainId, token, address).then((res) => {
-      console.log("Build refund magic spend res", res);
-      setCalls(res.data.calls);
-    });
-  };
-
   const handleBuildPaymasterGas = (chainId: number) => {
     buildPaymasterGasCall(chainId).then((res) => {
       console.log("Paymaster gas res", res);
@@ -156,7 +125,7 @@ export default function useTransactionParams(props: UseTransactionParamsProps) {
     });
   };
 
-  const handleBuildApproveOutbox = (
+  const handleBuildApproveAccount = (
     tokenAddress: Address,
     srcChainId: number,
     amount: number

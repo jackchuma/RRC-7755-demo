@@ -25,6 +25,7 @@ import Attributes from "@/utils/attributes";
 import { Call } from "@/utils/types/call";
 import { calculateRewardAmount } from "@/utils/calculateRewardAmount";
 import MockAccountTracker from "@/abis/MockAccountTracker";
+import MockToken from "@/abis/MockToken";
 
 export type BuildSubmitRequestCallResponse = {
   success: boolean;
@@ -144,6 +145,20 @@ async function buildPayload(
 ): Promise<Hex> {
   console.log("Building payload");
   if (requestType === RequestType.Standard) {
+    const calls = [];
+
+    if (token.id === TokenType.USDC) {
+      calls.push({
+        to: addressToBytes32(token.address),
+        data: encodeFunctionData({
+          abi: MockToken,
+          functionName: "approve",
+          args: [to, parseEther(amount.toString())],
+        }),
+        value: BigInt(0),
+      });
+    }
+
     const callDst = to;
     const data = encodeFunctionData({
       abi: MockAccountTracker,
@@ -153,7 +168,8 @@ async function buildPayload(
     const value =
       token.id === TokenType.ETH ? parseEther(amount.toString()) : BigInt(0);
 
-    const calls = [{ to: addressToBytes32(callDst), data, value }];
+    calls.push({ to: addressToBytes32(callDst), data, value });
+
     return encodeAbiParameters(Calls, [calls]);
   }
 

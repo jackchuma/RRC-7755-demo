@@ -116,11 +116,23 @@ export default function StepVisualizer({
 
   return (
     <div>
-      <h2 className="text-2xl font-semibold mb-6 gradient-text">
+      <h2 className="text-2xl font-semibold mb-1 gradient-text">
         {requestType === RequestType.Standard
           ? "Standard Request"
           : "4337 Smart Account Request"}
       </h2>
+
+      <div className="bg-card/30 rounded-lg p-3 border border-border/30 flex items-center gap-2 mb-6">
+        <p className="text-sm text-muted-foreground flex items-center gap-1">
+          Sending <span className="font-medium text-white">{amount}</span>
+          <span>{selectedToken.icon}</span> from
+        </p>
+        <span className="text-sm text-muted-foreground">
+          {sourceChain.icon} {sourceChain.name}
+          <span className="mx-2">→</span>
+          {destinationChain.icon} {destinationChain.name}
+        </span>
+      </div>
 
       <div className="relative">
         <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-500/50 to-purple-500/50 rounded-full"></div>
@@ -193,14 +205,6 @@ export default function StepVisualizer({
 
                 {index === currentStep && (
                   <div className="mt-4 space-y-4 animate-fade-in">
-                    <div className="bg-card/30 rounded-lg p-3 border border-border/30 flex items-center gap-2">
-                      <span className="text-sm text-muted-foreground">
-                        {sourceChain.icon} {sourceChain.name}
-                        <span className="mx-2">→</span>
-                        {destinationChain.icon} {destinationChain.name}
-                      </span>
-                    </div>
-
                     {step.id === StepId.GenerateProof && (
                       <div className="space-y-4">
                         {proof ? (
@@ -228,16 +232,6 @@ export default function StepVisualizer({
 
                     {address && transactionChain && calls.length > 0 && (
                       <div className="space-y-4">
-                        <div className="bg-card/40 rounded-lg p-3 border border-border/30">
-                          <p className="text-sm text-muted-foreground flex items-center gap-1">
-                            Sending{" "}
-                            <span className="font-medium text-white">
-                              {amount}
-                            </span>
-                            <span>{selectedToken.icon}</span>
-                          </p>
-                        </div>
-
                         <Transaction
                           chainId={transactionChain}
                           calls={calls}

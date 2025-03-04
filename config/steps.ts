@@ -9,18 +9,18 @@ export enum StepId {
   GenerateProof,
   SubmitHashiHeader,
   ClaimReward,
-  ApproveOutbox,
+  ApproveAccount,
   ApprovePaymaster,
   PrefundPaymasterGas,
   PrefundAccount,
 }
 
-const approveOutbox: Step = {
-  id: StepId.ApproveOutbox,
-  name: "Approve Outbox",
+const approveAccount: Step = {
+  id: StepId.ApproveAccount,
+  name: "Approve Account",
   chainTarget: TransactionTarget.SRC,
   description:
-    "Before locking your ERC20 tokens in the source chain Outbox contract, you'll need to approve the contract to access these tokens.",
+    "Before funding your mock account with USDC, you'll need to approve the contract to access these tokens.",
 };
 const approvePaymaster: Step = {
   id: StepId.ApprovePaymaster,
@@ -98,8 +98,8 @@ export const steps: Record<RequestType, Record<TokenType, Step[]>> = {
       claimReward,
     ],
     [TokenType.USDC]: [
+      approveAccount,
       prefundAccount,
-      approveOutbox,
       approvePaymaster,
       prefundPaymaster,
       submitRequest,
@@ -121,8 +121,8 @@ export const steps: Record<RequestType, Record<TokenType, Step[]>> = {
       claimReward,
     ],
     [TokenType.USDC]: [
+      approveAccount,
       prefundAccount,
-      approveOutbox,
       approvePaymaster,
       prefundPaymaster,
       prefundPaymasterGas,

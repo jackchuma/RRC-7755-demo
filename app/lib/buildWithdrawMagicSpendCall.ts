@@ -5,7 +5,7 @@ import chains from "@/config/chains";
 import { Call } from "@/utils/types/call";
 import { Address, encodeFunctionData, formatEther } from "viem";
 
-type WithdrawMagicSpendCallResponse = {
+export type WithdrawCallResponse = {
   success: boolean;
   data: { calls: Call[]; amount: number };
 };
@@ -14,7 +14,7 @@ export async function buildWithdrawMagicSpendCall(
   chainId: number,
   token: Address,
   address: Address
-): Promise<WithdrawMagicSpendCallResponse> {
+): Promise<WithdrawCallResponse> {
   const chainConfig = chains[chainId];
 
   const amount = await chainConfig.publicClient.readContract({

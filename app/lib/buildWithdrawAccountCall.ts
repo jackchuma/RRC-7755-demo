@@ -4,17 +4,14 @@ import MockAccountTracker from "@/abis/MockAccountTracker";
 import chains from "@/config/chains";
 import { Call } from "@/utils/types/call";
 import { Address, encodeFunctionData, formatEther } from "viem";
-
-type WithdrawAccountCallResponse = {
-  success: boolean;
-  data: { calls: Call[]; amount: number };
-};
+import { WithdrawCallResponse } from "./buildWithdrawMagicSpendCall";
 
 export async function buildWithdrawAccountCall(
   chainId: number,
   address: Address,
   token: Address
-): Promise<WithdrawAccountCallResponse> {
+): Promise<WithdrawCallResponse> {
+  console.log("Building withdraw account call");
   const chainConfig = chains[chainId];
 
   const amount = await chainConfig.publicClient.readContract({

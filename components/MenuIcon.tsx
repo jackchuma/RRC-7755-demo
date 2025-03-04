@@ -1,14 +1,13 @@
-import { Call } from "@/utils/types/call";
-import {
-  Transaction,
-  TransactionButton,
-} from "@coinbase/onchainkit/transaction";
 import { useState, useEffect, useRef } from "react";
+import WithdrawalModal from "./WithdrawalModal";
+import { chains } from "@/app/page";
+import { WithdrawCallResponse } from "@/app/lib/buildWithdrawMagicSpendCall";
+import { Call } from "@/utils/types/call";
 
 interface MenuOption {
   label: string;
   action: () => void;
-  calls: () => Promise<Call[]>;
+  calls: (chainId: number) => Promise<WithdrawCallResponse>;
   chainId: number;
 }
 
@@ -18,10 +17,69 @@ interface MenuIconProps {
 
 const MenuIcon: React.FC<MenuIconProps> = ({ options }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedOption, setSelectedOption] = useState<MenuOption | null>(null);
+  const [withdrawalAmount, setWithdrawalAmount] = useState(0);
+  const [selectedChainId, setSelectedChainId] = useState(0);
+  const [calls, setCalls] = useState<Call[]>([]);
   const menuRef = useRef<HTMLDivElement>(null);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
+  };
+
+  const handleOptionClick = async (option: MenuOption) => {
+    // If it's a reset option (chainId === 0), just execute the action
+    if (option.chainId === 0) {
+      option.action();
+      setIsOpen(false);
+      return;
+    }
+
+    try {
+      // For withdrawal options, open the modal
+      setSelectedOption(option);
+      setSelectedChainId(option.chainId);
+
+      // Set initial amount to 0
+      setWithdrawalAmount(0);
+
+      // Open the modal
+      setIsModalOpen(true);
+      setIsOpen(false);
+
+      // Fetch the amount asynchronously
+      fetchWithdrawalAmount(option, option.chainId);
+    } catch (error) {
+      console.error("Error handling option click:", error);
+    }
+  };
+
+  const fetchWithdrawalAmount = async (option: MenuOption, chainId: number) => {
+    try {
+      const res = await option.calls(chainId);
+
+      setWithdrawalAmount(res.data.amount);
+      setCalls(res.data.calls);
+    } catch (error) {
+      console.error("Error fetching withdrawal amount:", error);
+    }
+  };
+
+  const handleChainChange = (chainId: number) => {
+    setSelectedChainId(chainId);
+
+    // When the chain changes, we need to update the withdrawal amount
+    if (selectedOption) {
+      fetchWithdrawalAmount(selectedOption, chainId);
+    }
+  };
+
+  const handleWithdrawSuccess = () => {
+    setIsModalOpen(false);
+    if (selectedOption) {
+      selectedOption.action();
+    }
   };
 
   useEffect(() => {
@@ -68,32 +126,31 @@ const MenuIcon: React.FC<MenuIconProps> = ({ options }) => {
 
       {isOpen && (
         <div className="absolute top-12 left-0 w-48 bg-gradient-to-br from-indigo-800 to-purple-900 rounded-md shadow-xl py-1 mt-2 border border-indigo-500/30 backdrop-blur-sm">
-          {options.map((option, index) =>
-            option.chainId !== 0 ? (
-              <Transaction
-                chainId={option.chainId}
-                calls={option.calls}
-                onSuccess={() => setIsOpen(false)}
-              >
-                <TransactionButton
-                  className="block w-full px-4 py-2 text-sm hover:bg-indigo-600/50 transition-colors bg-inherit border-none rounded-none [&>div]:justify-start [&>div]:text-white [&>div]:font-normal"
-                  text={option.label}
-                />
-              </Transaction>
-            ) : (
-              <button
-                key={index}
-                onClick={() => {
-                  option.action();
-                  setIsOpen(false);
-                }}
-                className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-indigo-600/50 transition-colors"
-              >
-                {option.label}
-              </button>
-            )
-          )}
+          {options.map((option, index) => (
+            <button
+              key={index}
+              onClick={() => handleOptionClick(option)}
+              className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-indigo-600/50 transition-colors"
+            >
+              {option.label}
+            </button>
+          ))}
         </div>
+      )}
+
+      {/* Withdrawal Modal */}
+      {selectedOption && (
+        <WithdrawalModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          title={selectedOption.label}
+          amount={withdrawalAmount}
+          chains={chains}
+          initialChainId={selectedChainId}
+          onChainChange={handleChainChange}
+          onWithdraw={handleWithdrawSuccess}
+          calls={calls}
+        />
       )}
     </div>
   );

@@ -14,13 +14,15 @@ import { ProofType } from "@/utils/types/proof";
 import useBalance from "@/hooks/useBalance";
 import { tokens } from "@/config/tokens";
 import BalancesPanel from "@/components/BalancesPanel";
-import { buildWithdrawMagicSpendCall } from "./lib/buildWithdrawMagicSpendCall";
+import {
+  buildWithdrawMagicSpendCall,
+  WithdrawCallResponse,
+} from "./lib/buildWithdrawMagicSpendCall";
 import { useAccount } from "wagmi";
-import { Call } from "@/utils/types/call";
 import { buildWithdrawGasCall } from "./lib/buildWithdrawGasCall";
 import { buildWithdrawAccountCall } from "./lib/buildWithdrawAccountCall";
 
-const chains = [
+export const chains = [
   { id: 84532, name: "Base Sepolia", icon: "🔷" },
   { id: 11155420, name: "Optimism Sepolia", icon: "🔴" },
   { id: 421614, name: "Arbitrum Sepolia", icon: "🔵" },
@@ -92,48 +94,69 @@ export default function Home() {
     setProof(p);
   };
 
-  const handleRefundMagicSpend = async (): Promise<Call[]> => {
+  const handleRefundMagicSpend = async (
+    chainId: number
+  ): Promise<WithdrawCallResponse> => {
     console.log("Refund magic spend action triggered");
     if (!address) {
       console.error("No address found");
-      return [];
+      return { success: false, data: { calls: [], amount: 0 } };
     }
 
-    const res = await buildWithdrawMagicSpendCall(
-      destinationChain.id,
-      selectedToken.address,
-      address
-    );
-    console.log(res);
-    return res.data.amount > 0 ? res.data.calls : [];
+    try {
+      const res = await buildWithdrawMagicSpendCall(
+        chainId,
+        selectedToken.address,
+        address
+      );
+      console.log("Withdrawal response:", res);
+      return res;
+    } catch (error) {
+      console.error("Error building withdraw magic spend call:", error);
+      return { success: false, data: { calls: [], amount: 0 } };
+    }
   };
 
-  const handleRefundGas = async (): Promise<Call[]> => {
+  const handleRefundGas = async (
+    chainId: number
+  ): Promise<WithdrawCallResponse> => {
     console.log("Refund gas action triggered");
     if (!address) {
       console.error("No address found");
-      return [];
+      return { success: false, data: { calls: [], amount: 0 } };
     }
 
-    const res = await buildWithdrawGasCall(destinationChain.id, address);
-    console.log(res);
-    return res.data.amount > 0 ? res.data.calls : [];
+    try {
+      const res = await buildWithdrawGasCall(chainId, address);
+      console.log("Withdrawal response:", res);
+      return res;
+    } catch (error) {
+      console.error("Error building withdraw gas call:", error);
+      return { success: false, data: { calls: [], amount: 0 } };
+    }
   };
 
-  const handleRefundAccount = async (): Promise<Call[]> => {
+  const handleRefundAccount = async (
+    chainId: number
+  ): Promise<WithdrawCallResponse> => {
     console.log("Refund account action triggered");
     if (!address) {
       console.error("No address found");
-      return [];
+      return { success: false, data: { calls: [], amount: 0 } };
     }
 
-    const res = await buildWithdrawAccountCall(
-      sourceChain.id,
-      address,
-      selectedToken.address
-    );
-    console.log(res);
-    return res.data.amount > 0 ? res.data.calls : [];
+    try {
+      const res = await buildWithdrawAccountCall(
+        chainId,
+        address,
+        selectedToken.address
+      );
+      console.log("Withdrawal response:", res);
+      return res;
+    } catch (error) {
+      console.error("Error building withdraw account call:", error);
+      return { success: false, data: { calls: [], amount: 0 } };
+    }
   };
 
   const handleReset = () => {
@@ -144,30 +167,35 @@ export default function Home() {
     setAmount("");
   };
 
-  // Menu options
   const menuOptions = [
     {
-      label: "Withdraw from Paymaster",
-      action: handleRefundMagicSpend,
+      label: "Paymaster Withdrawal",
+      action: async () => {
+        console.log("Paymaster Withdrawal action success");
+      },
       calls: handleRefundMagicSpend,
       chainId: destinationChain.id,
     },
     {
-      label: "Withdraw from EntryPoint",
-      action: handleRefundGas,
+      label: "EntryPoint Withdrawal",
+      action: async () => {
+        console.log("EntryPoint Withdrawal action success");
+      },
       calls: handleRefundGas,
       chainId: destinationChain.id,
     },
     {
-      label: "Withdraw from Account",
-      action: handleRefundAccount,
+      label: "Account Withdrawal",
+      action: async () => {
+        console.log("Account Withdrawal action success");
+      },
       calls: handleRefundAccount,
       chainId: sourceChain.id,
     },
     {
       label: "Reset",
       action: handleReset,
-      calls: async () => [],
+      calls: async () => ({ success: true, data: { calls: [], amount: 0 } }),
       chainId: 0,
     },
   ];

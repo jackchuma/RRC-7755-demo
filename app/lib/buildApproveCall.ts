@@ -1,6 +1,6 @@
 "use server";
 
-import ERC20 from "@/abis/ERC20";
+import MockToken from "@/abis/MockToken";
 import chains from "@/config/chains";
 import { calculateRewardAmount } from "@/utils/calculateRewardAmount";
 import { BuildCallsResponse } from "@/utils/types/buildCallsReponse";
@@ -23,7 +23,7 @@ export async function buildApproveCall(
     {
       to: tokenAddress,
       data: encodeFunctionData({
-        abi: ERC20,
+        abi: MockToken,
         functionName: "approve",
         args: [addr, parseEther(amountToApprove.toString())],
       }),

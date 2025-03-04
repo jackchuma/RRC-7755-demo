@@ -77,7 +77,7 @@ const MenuIcon: React.FC<MenuIconProps> = ({ options, dstChainId }) => {
                 onSuccess={() => setIsOpen(false)}
               >
                 <TransactionButton
-                  className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-indigo-600/50 transition-colors bg-inherit border-none rounded-none"
+                  className="block w-full px-4 py-2 text-sm hover:bg-indigo-600/50 transition-colors bg-inherit border-none rounded-none [&>div]:justify-start [&>div]:text-white [&>div]:font-normal"
                   text={option.label}
                 />
               </Transaction>

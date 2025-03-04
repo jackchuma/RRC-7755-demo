@@ -14,6 +14,7 @@ export enum StepId {
   PrefundPaymasterGas,
   RefundMagicSpend,
   RefundGas,
+  PrefundAccount,
 }
 
 const approveOutbox: Step = {
@@ -82,10 +83,17 @@ const refundGas: Step = {
   chainTarget: TransactionTarget.DST,
   description: "",
 };
+const prefundAccount: Step = {
+  id: StepId.PrefundAccount,
+  name: "Prefund Account",
+  chainTarget: TransactionTarget.SRC,
+  description: "",
+};
 
 export const steps: Record<RequestType, Record<TokenType, Step[]>> = {
   [RequestType.Standard]: {
     [TokenType.ETH]: [
+      prefundAccount,
       prefundPaymaster,
       submitRequest,
       fulfillRequest,
@@ -95,6 +103,7 @@ export const steps: Record<RequestType, Record<TokenType, Step[]>> = {
       refundMagicSpend,
     ],
     [TokenType.USDC]: [
+      prefundAccount,
       approveOutbox,
       approvePaymaster,
       prefundPaymaster,
@@ -108,6 +117,7 @@ export const steps: Record<RequestType, Record<TokenType, Step[]>> = {
   },
   [RequestType.SmartAccount]: {
     [TokenType.ETH]: [
+      prefundAccount,
       prefundPaymaster,
       prefundPaymasterGas,
       submitRequest,
@@ -119,6 +129,7 @@ export const steps: Record<RequestType, Record<TokenType, Step[]>> = {
       refundGas,
     ],
     [TokenType.USDC]: [
+      prefundAccount,
       approveOutbox,
       approvePaymaster,
       prefundPaymaster,

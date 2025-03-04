@@ -51,7 +51,7 @@ export default function BalancesPanel({
               <div className="flex justify-between">
                 <span>Account:</span>
                 <span className="font-bold text-green-400">
-                  {sourceBalances.account.toLocaleString()} {token.icon}
+                  {sourceBalances.account} {token.icon}
                 </span>
               </div>
             </div>
@@ -60,7 +60,7 @@ export default function BalancesPanel({
               <div className="flex justify-between">
                 <span>Fulfiller:</span>
                 <span className="font-bold text-yellow-400">
-                  {sourceBalances.fulfiller.toLocaleString()} {token.icon}
+                  {sourceBalances.fulfiller} {token.icon}
                 </span>
               </div>
             </div>
@@ -69,7 +69,7 @@ export default function BalancesPanel({
               <div className="flex justify-between">
                 <span>Outbox:</span>
                 <span className="font-bold text-purple-400">
-                  {sourceBalances.outbox.toLocaleString()} {token.icon}
+                  {sourceBalances.outbox} {token.icon}
                 </span>
               </div>
             </div>
@@ -92,7 +92,7 @@ export default function BalancesPanel({
               <div className="flex justify-between">
                 <span>Account:</span>
                 <span className="font-bold text-green-400">
-                  {destinationBalances.account.toLocaleString()} {token.icon}
+                  {destinationBalances.account} {token.icon}
                 </span>
               </div>
             </div>
@@ -101,7 +101,7 @@ export default function BalancesPanel({
               <div className="flex justify-between">
                 <span>Fulfiller:</span>
                 <span className="font-bold text-yellow-400">
-                  {destinationBalances.fulfiller.toLocaleString()} {token.icon}
+                  {destinationBalances.fulfiller} {token.icon}
                 </span>
               </div>
             </div>
@@ -110,7 +110,7 @@ export default function BalancesPanel({
               <div className="flex justify-between">
                 <span>Paymaster:</span>
                 <span className="font-bold text-blue-400">
-                  {destinationBalances.paymaster.toLocaleString()} {token.icon}
+                  {destinationBalances.paymaster} {token.icon}
                 </span>
               </div>
             </div>
@@ -119,7 +119,7 @@ export default function BalancesPanel({
               <div className="flex justify-between">
                 <span>Entry Point:</span>
                 <span className="font-bold text-red-400">
-                  {destinationBalances.entryPoint.toLocaleString()} {token.icon}
+                  {destinationBalances.entryPoint} {token.icon}
                 </span>
               </div>
             </div>

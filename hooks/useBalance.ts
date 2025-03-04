@@ -17,6 +17,10 @@ export default function useBalance(chainId: number, token: Token) {
   useEffect(() => {
     if (!address) return;
 
+    getBalances(chainId, token, address).then((res) => {
+      setBalance(res.data.balances);
+    });
+
     const intervalId = setInterval(() => {
       getBalances(chainId, token, address).then((res) => {
         setBalance(res.data.balances);

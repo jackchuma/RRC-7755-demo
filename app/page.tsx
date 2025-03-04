@@ -12,7 +12,6 @@ import { steps } from "@/config/steps";
 import { ProofType } from "@/utils/types/proof";
 import useBalance from "@/hooks/useBalance";
 import { tokens } from "@/config/tokens";
-import AddressInput from "@/components/AddressInput";
 import BalancesPanel from "@/components/BalancesPanel";
 
 const chains = [
@@ -34,7 +33,6 @@ export default function Home() {
   const [currentStep, setCurrentStep] = useState(0);
   const [sourceChain, setSourceChain] = useState(chains[2]);
   const [destinationChain, setDestinationChain] = useState(chains[0]);
-  const [destinationAddress, setDestinationAddress] = useState("");
   const [request, setRequest] = useState<Request>();
   const [proof, setProof] = useState<ProofType>();
   const [requestType, setRequestType] = useState(requests[0]);
@@ -85,10 +83,6 @@ export default function Home() {
 
   const handleSetProof = (p?: ProofType) => {
     setProof(p);
-  };
-
-  const handleDestinationAddressChange = (value: string) => {
-    setDestinationAddress(value);
   };
 
   return (
@@ -143,12 +137,11 @@ export default function Home() {
           <AmountInput
             amount={amount}
             onAmountChange={handleAmountChange}
-            maxAmount={sourceChainBalances.account}
-            disabled={currentStep > 0}
-          />
-          <AddressInput
-            destinationAddress={destinationAddress}
-            onDestinationAddressChange={handleDestinationAddressChange}
+            maxAmount={
+              currentStep === 0
+                ? sourceChainBalances.fulfiller
+                : sourceChainBalances.account
+            }
             disabled={currentStep > 0}
           />
         </div>

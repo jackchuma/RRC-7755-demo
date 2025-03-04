@@ -13,7 +13,6 @@ import {
 
 import Outbox from "@/abis/Outbox";
 import Calls from "@/abis/Calls";
-import ERC20 from "@/abis/ERC20";
 import PackedUserOperation from "@/abis/PackedUserOperation";
 import { RequestType } from "@/utils/types/request";
 import { Token, TokenType } from "@/utils/types/tokenType";
@@ -23,23 +22,23 @@ import MockAccount from "@/abis/MockAccount";
 import addressToBytes32 from "@/utils/addressToBytes32";
 import chains from "@/config/chains";
 import Attributes from "@/utils/attributes";
-import { nativeAssetAddress } from "@/utils/constants";
 import { Call } from "@/utils/types/call";
 import { calculateRewardAmount } from "@/utils/calculateRewardAmount";
+import MockAccountTracker from "@/abis/MockAccountTracker";
 
-export type BuildTransactionResponse = {
+export type BuildSubmitRequestCallResponse = {
   success: boolean;
-  data: { id: Hex; calls: Call[]; args: any };
+  data: { id: Hex; calls: Call[]; args: any; sender: Hex };
 };
 
-export async function buildTransaction(
+export async function buildSubmitRequestCall(
   sourceChainId: number,
   dstChainId: number,
   requestType: RequestType,
   to: Address,
   token: Token,
   amount: number
-): Promise<BuildTransactionResponse> {
+): Promise<BuildSubmitRequestCallResponse> {
   console.log("Building transaction");
   const srcChain = chains[sourceChainId];
   const dstChain = chains[dstChainId];
@@ -68,7 +67,7 @@ export async function buildTransaction(
     token,
     amount,
     finalityDelay,
-    to,
+    srcChain.contracts.mockAccountTracker,
     dstChain.l2Oracle,
     srcChain.contracts.shoyuBashi,
     sourceChainId,
@@ -81,6 +80,7 @@ export async function buildTransaction(
     token,
     amount,
     to,
+    dstChain.contracts.mockAccountTracker,
     dstChain.contracts.paymaster,
     attributes,
     dstChainId
@@ -108,25 +108,35 @@ export async function buildTransaction(
     ],
   });
 
+  const innerRequest = encodeFunctionData({
+    abi: Outbox,
+    functionName: "sendMessage",
+    args,
+  });
+
   const calls: Call[] = [
     {
-      to: address as Hex,
+      to: srcChain.contracts.mockAccountTracker,
       data: encodeFunctionData({
-        abi: Outbox,
-        functionName: "sendMessage",
-        args,
+        abi: MockAccountTracker,
+        functionName: "request",
+        args: [address, innerRequest, token.address, value],
       }),
-      value: token.id === TokenType.ETH ? value : BigInt(0),
+      value: BigInt(0),
     },
   ];
 
-  return { success: true, data: { id, calls, args } };
+  return {
+    success: true,
+    data: { id, calls, args, sender: addressToBytes32(address) },
+  };
 }
 
 async function buildPayload(
   requestType: RequestType,
   token: Token,
   amount: number,
+  eoaAccount: Address,
   to: Address,
   paymaster: Address,
   attributes: Hex[],
@@ -134,19 +144,14 @@ async function buildPayload(
 ): Promise<Hex> {
   console.log("Building payload");
   if (requestType === RequestType.Standard) {
-    let callDst = token.address;
-    let data = encodeFunctionData({
-      abi: ERC20,
-      functionName: "transfer",
-      args: [to, parseEther(amount.toString())],
+    const callDst = to;
+    const data = encodeFunctionData({
+      abi: MockAccountTracker,
+      functionName: "deposit",
+      args: [eoaAccount, token.address, parseEther(amount.toString())],
     });
-    let value = BigInt(0);
-
-    if (token.id === TokenType.ETH) {
-      callDst = to;
-      data = "0x" as Hex;
-      value = parseEther(amount.toString());
-    }
+    const value =
+      token.id === TokenType.ETH ? parseEther(amount.toString()) : BigInt(0);
 
     const calls = [{ to: addressToBytes32(callDst), data, value }];
     return encodeAbiParameters(Calls, [calls]);

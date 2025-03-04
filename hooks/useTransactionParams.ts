@@ -1,4 +1,7 @@
-import { buildTransaction, BuildTransactionResponse } from "@/app/lib/actions";
+import {
+  buildSubmitRequestCall,
+  BuildSubmitRequestCallResponse,
+} from "@/app/lib/buildSubmitRequestCall";
 import { buildApproveCall } from "@/app/lib/buildApproveCall";
 import { buildClaimRewardCall } from "@/app/lib/buildClaimRewardCall";
 import { buildFulfillmentCall } from "@/app/lib/buildFulfillmentCall";
@@ -7,6 +10,7 @@ import { buildPaymasterGasCall } from "@/app/lib/buildPaymasterGasCall";
 import { buildShoyuBashiCall } from "@/app/lib/buildShoyuBashiCall";
 import { buildWithdrawGasCall } from "@/app/lib/buildWithdrawGasCall";
 import { buildWithdrawMagicSpendCall } from "@/app/lib/buildWithdrawMagicSpendCall";
+import { buildFundMockAccountCall } from "@/app/lib/fundMockAccount";
 import { StepId } from "@/config/steps";
 import addressToBytes32 from "@/utils/addressToBytes32";
 import { Call } from "@/utils/types/call";
@@ -95,6 +99,13 @@ export default function useTransactionParams(props: UseTransactionParamsProps) {
       case StepId.RefundGas:
         handleBuildRefundGas(props.destinationChain.id, address);
         break;
+      case StepId.PrefundAccount:
+        handleBuildPrefundAccount(
+          props.sourceChain.id,
+          props.selectedToken,
+          props.amount
+        );
+        break;
     }
   }, [
     address,
@@ -106,6 +117,19 @@ export default function useTransactionParams(props: UseTransactionParamsProps) {
     props.stepId,
     props.request?.id,
   ]);
+
+  const handleBuildPrefundAccount = (
+    chainId: number,
+    token: Token,
+    amount: number
+  ) => {
+    if (amount > 0) {
+      buildFundMockAccountCall(chainId, token, amount).then((res) => {
+        console.log("Prefund Account res", res);
+        setCalls(res.data.calls);
+      });
+    }
+  };
 
   const handleBuildRefundGas = (chainId: number, address: Address) => {
     buildWithdrawGasCall(chainId, address).then((res) => {
@@ -186,7 +210,7 @@ export default function useTransactionParams(props: UseTransactionParamsProps) {
     selectedToken: Token
   ) => {
     if (addr != zeroAddress && amount > 0 && srcChainId !== dstChainId) {
-      buildTransaction(
+      buildSubmitRequestCall(
         srcChainId,
         dstChainId,
         requestType,
@@ -246,7 +270,7 @@ export default function useTransactionParams(props: UseTransactionParamsProps) {
   const handleBuildSubmissionResponse = (
     requestType: RequestType,
     srcChainId: number,
-    res: BuildTransactionResponse
+    res: BuildSubmitRequestCallResponse
   ) => {
     console.log(res);
     if (res.success) {
@@ -255,7 +279,7 @@ export default function useTransactionParams(props: UseTransactionParamsProps) {
       const req: Request = {
         id: res.data.id,
         srcChain: toHex(srcChainId, { size: 32 }),
-        sender: addressToBytes32(res.data.calls[0].to),
+        sender: res.data.sender,
         dstChain,
         receiver,
         payload,

@@ -23,6 +23,46 @@ export default [
   },
   {
     type: "function",
+    name: "executeUserOpWithCalls",
+    inputs: [
+      {
+        name: "paymaster",
+        type: "address",
+        internalType: "address",
+      },
+      {
+        name: "token",
+        type: "bytes32",
+        internalType: "bytes32",
+      },
+      {
+        name: "calls",
+        type: "tuple[]",
+        internalType: "struct MockAccount.Call[]",
+        components: [
+          {
+            name: "to",
+            type: "bytes32",
+            internalType: "bytes32",
+          },
+          {
+            name: "data",
+            type: "bytes",
+            internalType: "bytes",
+          },
+          {
+            name: "value",
+            type: "uint256",
+            internalType: "uint256",
+          },
+        ],
+      },
+    ],
+    outputs: [],
+    stateMutability: "nonpayable",
+  },
+  {
+    type: "function",
     name: "test",
     inputs: [],
     outputs: [],

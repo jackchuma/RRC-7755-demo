@@ -32,6 +32,12 @@ export type BuildSubmitRequestCallResponse = {
   data: { id: Hex; calls: Call[]; args: any; sender: Hex };
 };
 
+type OnchainCall = {
+  to: Address;
+  data: Hex;
+  value: bigint;
+};
+
 export async function buildSubmitRequestCall(
   sourceChainId: number,
   dstChainId: number,
@@ -144,32 +150,32 @@ async function buildPayload(
   dstChainId: number
 ): Promise<Hex> {
   console.log("Building payload");
-  if (requestType === RequestType.Standard) {
-    const calls = [];
+  const calls: OnchainCall[] = [];
 
-    if (token.id === TokenType.USDC) {
-      calls.push({
-        to: addressToBytes32(token.address),
-        data: encodeFunctionData({
-          abi: MockToken,
-          functionName: "approve",
-          args: [to, parseEther(amount.toString())],
-        }),
-        value: BigInt(0),
-      });
-    }
-
-    const callDst = to;
-    const data = encodeFunctionData({
-      abi: MockAccountTracker,
-      functionName: "deposit",
-      args: [eoaAccount, token.address, parseEther(amount.toString())],
+  if (token.id === TokenType.USDC) {
+    calls.push({
+      to: addressToBytes32(token.address),
+      data: encodeFunctionData({
+        abi: MockToken,
+        functionName: "approve",
+        args: [to, parseEther(amount.toString())],
+      }),
+      value: BigInt(0),
     });
-    const value =
-      token.id === TokenType.ETH ? parseEther(amount.toString()) : BigInt(0);
+  }
 
-    calls.push({ to: addressToBytes32(callDst), data, value });
+  const callDst = addressToBytes32(to);
+  const data = encodeFunctionData({
+    abi: MockAccountTracker,
+    functionName: "deposit",
+    args: [eoaAccount, token.address, parseEther(amount.toString())],
+  });
+  const value =
+    token.id === TokenType.ETH ? parseEther(amount.toString()) : BigInt(0);
 
+  calls.push({ to: callDst, data, value });
+
+  if (requestType === RequestType.Standard) {
     return encodeAbiParameters(Calls, [calls]);
   }
 
@@ -179,7 +185,8 @@ async function buildPayload(
     attributes,
     amount,
     dstChainId,
-    token.address
+    token.address,
+    calls
   );
 }
 
@@ -241,7 +248,8 @@ async function buildUserOp(
   attributes: Hex[],
   amount: number,
   dstChainId: number,
-  token: Address
+  token: Address,
+  innerCalls: OnchainCall[]
 ): Promise<Hex> {
   console.log("Building user op");
   const verificationGasLimit = BigInt(100_000);
@@ -257,8 +265,8 @@ async function buildUserOp(
     initCode: "0x" as Hex,
     callData: encodeFunctionData({
       abi: MockAccount,
-      functionName: "executeUserOp",
-      args: [paymaster, addressToBytes32(token)],
+      functionName: "executeUserOpWithCalls",
+      args: [paymaster, addressToBytes32(token), innerCalls],
     }),
     accountGasLimits: encodePacked(
       ["uint128", "uint128"],

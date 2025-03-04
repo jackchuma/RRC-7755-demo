@@ -29,102 +29,112 @@ export default function BalancesPanel({
   handleDestinationChainChange,
 }: BalancesPanelProps) {
   return (
-    <div className="bg-gray-800 p-6 rounded-lg shadow-lg w-full mb-6 mt-6">
-      <h2 className="text-2xl font-semibold mb-4 text-center">
+    <div>
+      <h2 className="text-2xl font-semibold mb-4 text-center gradient-text">
         System Balances
       </h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Source Chain Balances */}
-        <div className="border border-gray-700 rounded-lg p-4">
-          <Selector
-            items={chains}
-            selected={sourceChain}
-            onChange={handleSourceChainChange}
-            label="Source Chain"
-            displayIcon={true}
-            disabled={currentStep > 0}
-          />
+        <div className="bg-card/30 border border-border/30 rounded-xl p-5 transition-all hover:border-border/50">
+          <div className="mb-4">
+            <Selector
+              items={chains}
+              selected={sourceChain}
+              onChange={handleSourceChainChange}
+              label="Source Chain"
+              displayIcon={true}
+              disabled={currentStep > 0}
+            />
+          </div>
 
-          <div className="space-y-2">
-            <div className={"p-2 rounded"}>
-              <div className="flex justify-between">
-                <span>Account:</span>
-                <span className="font-bold text-green-400">
-                  {sourceBalances.account} {token.icon}
-                </span>
-              </div>
-            </div>
+          <div className="space-y-3">
+            <BalanceItem
+              label="Account"
+              value={sourceBalances.account}
+              token={token}
+              colorClass="text-emerald-400"
+            />
 
-            <div className={"p-2 rounded"}>
-              <div className="flex justify-between">
-                <span>Fulfiller:</span>
-                <span className="font-bold text-yellow-400">
-                  {sourceBalances.fulfiller} {token.icon}
-                </span>
-              </div>
-            </div>
+            <BalanceItem
+              label="Fulfiller"
+              value={sourceBalances.fulfiller}
+              token={token}
+              colorClass="text-amber-400"
+            />
 
-            <div className={"p-2 rounded"}>
-              <div className="flex justify-between">
-                <span>Outbox:</span>
-                <span className="font-bold text-purple-400">
-                  {sourceBalances.outbox} {token.icon}
-                </span>
-              </div>
-            </div>
+            <BalanceItem
+              label="Outbox"
+              value={sourceBalances.outbox}
+              token={token}
+              colorClass="text-purple-400"
+            />
           </div>
         </div>
 
         {/* Destination Chain Balances */}
-        <div className="border border-gray-700 rounded-lg p-4">
-          <Selector
-            items={chains}
-            selected={destinationChain}
-            onChange={handleDestinationChainChange}
-            label="Destination Chain"
-            displayIcon={true}
-            disabled={currentStep > 0}
-          />
+        <div className="bg-card/30 border border-border/30 rounded-xl p-5 transition-all hover:border-border/50">
+          <div className="mb-4">
+            <Selector
+              items={chains}
+              selected={destinationChain}
+              onChange={handleDestinationChainChange}
+              label="Destination Chain"
+              displayIcon={true}
+              disabled={currentStep > 0}
+            />
+          </div>
 
-          <div className="space-y-2">
-            <div className={"p-2 rounded"}>
-              <div className="flex justify-between">
-                <span>Account:</span>
-                <span className="font-bold text-green-400">
-                  {destinationBalances.account} {token.icon}
-                </span>
-              </div>
-            </div>
+          <div className="space-y-3">
+            <BalanceItem
+              label="Account"
+              value={destinationBalances.account}
+              token={token}
+              colorClass="text-emerald-400"
+            />
 
-            <div className="p-2 rounded">
-              <div className="flex justify-between">
-                <span>Fulfiller:</span>
-                <span className="font-bold text-yellow-400">
-                  {destinationBalances.fulfiller} {token.icon}
-                </span>
-              </div>
-            </div>
+            <BalanceItem
+              label="Fulfiller"
+              value={destinationBalances.fulfiller}
+              token={token}
+              colorClass="text-amber-400"
+            />
 
-            <div className="p-2 rounded">
-              <div className="flex justify-between">
-                <span>Paymaster:</span>
-                <span className="font-bold text-blue-400">
-                  {destinationBalances.paymaster} {token.icon}
-                </span>
-              </div>
-            </div>
+            <BalanceItem
+              label="Paymaster"
+              value={destinationBalances.paymaster}
+              token={token}
+              colorClass="text-blue-400"
+            />
 
-            <div className="p-2 rounded">
-              <div className="flex justify-between">
-                <span>Entry Point:</span>
-                <span className="font-bold text-red-400">
-                  {destinationBalances.entryPoint} {token.icon}
-                </span>
-              </div>
-            </div>
+            <BalanceItem
+              label="Entry Point"
+              value={destinationBalances.entryPoint}
+              token={token}
+              colorClass="text-rose-400"
+            />
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+interface BalanceItemProps {
+  label: string;
+  value: number;
+  token: Token;
+  colorClass: string;
+}
+
+function BalanceItem({ label, value, token, colorClass }: BalanceItemProps) {
+  return (
+    <div className="bg-card/40 rounded-lg p-3 transition-all hover:bg-card/60">
+      <div className="flex justify-between items-center">
+        <span className="text-muted-foreground">{label}:</span>
+        <span className={`font-medium ${colorClass} flex items-center gap-1`}>
+          {value} <span className="text-lg">{token.icon}</span>
+        </span>
       </div>
     </div>
   );

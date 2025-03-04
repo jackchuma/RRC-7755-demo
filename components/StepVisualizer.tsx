@@ -112,91 +112,156 @@ export default function StepVisualizer({
   }
 
   const buttonClassName =
-    "w-full rounded-xl px-4 py-3 font-medium text-base text-black leading-6 cursor-pointer ock-bg-primary active:bg-[var(--ock-bg-primary-active)] hover:bg-[var(--ock-bg-primary-hover)]";
+    "w-full rounded-xl px-4 py-3 font-medium text-base bg-primary text-primary-foreground leading-6 cursor-pointer transition-all hover:bg-primary-hover active:scale-[0.98] shadow-sm";
 
   return (
-    <div className="w-full lg:w-1/2 mt-8 lg:mt-0 lg:px-8">
-      <h2 className="text-2xl font-semibold mb-4">
+    <div>
+      <h2 className="text-2xl font-semibold mb-6 gradient-text">
         {requestType === RequestType.Standard
           ? "Standard Request"
           : "4337 Smart Account Request"}
       </h2>
-      <ol className="relative border-l border-gray-700">
-        {steps.map((step, index) => (
-          <li key={index} className="mb-10 ml-6">
-            <span
-              className={`absolute flex items-center justify-center w-8 h-8 rounded-full -left-4 ring-4 ${
+
+      <div className="relative">
+        <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gradient-to-b from-blue-500/50 to-purple-500/50 rounded-full"></div>
+
+        <div className="space-y-8 pl-12">
+          {steps.map((step, index) => (
+            <div
+              key={index}
+              className={`relative transition-all duration-300 ${
                 index < currentStep
-                  ? "bg-green-900 ring-green-900"
+                  ? "opacity-100"
                   : index === currentStep
-                  ? "bg-blue-900 ring-blue-900"
-                  : "bg-gray-700 ring-gray-900"
+                  ? "opacity-100"
+                  : "opacity-100"
               }`}
             >
-              {index < currentStep ? "✓" : index + 1}
-            </span>
-            <h3
-              className={`font-medium leading-tight ${
-                index < currentStep
-                  ? "text-green-400"
-                  : index === currentStep
-                  ? "text-blue-400"
-                  : "text-gray-500"
-              }`}
-            >
-              {step.name}
-            </h3>
-            {index === currentStep && (
-              <div className="mt-4">
-                <p className="text-sm text-gray-400 mb-2">
-                  {sourceChain.icon} {sourceChain.name} →{" "}
-                  {destinationChain.icon} {destinationChain.name}
-                </p>
-                {step.id === StepId.GenerateProof && (
-                  <>
-                    {proof ? (
-                      <>
-                        <ProofVisualizer proof={proof} />
-                        <button
-                          className={buttonClassName}
-                          onClick={onNextStep}
-                        >
-                          Next
-                        </button>
-                      </>
-                    ) : (
-                      <button
-                        className={buttonClassName}
-                        onClick={handleGenerateProof}
-                      >
-                        Generate Proof
-                      </button>
-                    )}
-                  </>
-                )}
-                {address && transactionChain && calls.length > 0 && (
-                  <>
-                    <p className="text-sm text-gray-400 mb-2">
-                      Sending {amount} {selectedToken.icon}
-                    </p>
-                    <Transaction
-                      chainId={transactionChain}
-                      calls={calls}
-                      onStatus={handleOnStatus}
-                    >
-                      <TransactionButton />
-                      <TransactionStatus>
-                        <TransactionStatusLabel />
-                        <TransactionStatusAction />
-                      </TransactionStatus>
-                    </Transaction>
-                  </>
+              <div
+                className={`absolute -left-12 flex items-center justify-center w-8 h-8 rounded-full transition-all z-10 ${
+                  index < currentStep
+                    ? "bg-[#101218] text-emerald-400 border-2 border-emerald-500"
+                    : index === currentStep
+                    ? "bg-[#101218] text-blue-400 border-2 border-blue-500 animate-pulse"
+                    : "bg-[#101218] text-gray-400 border-2 border-gray-700"
+                }`}
+              >
+                {index < currentStep ? (
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-4 w-4"
+                    viewBox="0 0 20 20"
+                    fill="currentColor"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                ) : (
+                  <span className="text-sm">{index + 1}</span>
                 )}
               </div>
-            )}
-          </li>
-        ))}
-      </ol>
+
+              <div>
+                <h3
+                  className={`font-medium text-lg mb-1 ${
+                    index < currentStep
+                      ? "text-emerald-400"
+                      : index === currentStep
+                      ? "text-blue-400"
+                      : "text-gray-400"
+                  }`}
+                >
+                  {step.name}
+                </h3>
+
+                {index === currentStep && (
+                  <p
+                    className={`text-sm mb-2 ${
+                      index < currentStep
+                        ? "text-emerald-400/80"
+                        : index === currentStep
+                        ? "text-blue-400/80"
+                        : "text-gray-400/80"
+                    }`}
+                  >
+                    {step.description}
+                  </p>
+                )}
+
+                {index === currentStep && (
+                  <div className="mt-4 space-y-4 animate-fade-in">
+                    <div className="bg-card/30 rounded-lg p-3 border border-border/30 flex items-center gap-2">
+                      <span className="text-sm text-muted-foreground">
+                        {sourceChain.icon} {sourceChain.name}
+                        <span className="mx-2">→</span>
+                        {destinationChain.icon} {destinationChain.name}
+                      </span>
+                    </div>
+
+                    {step.id === StepId.GenerateProof && (
+                      <div className="space-y-4">
+                        {proof ? (
+                          <>
+                            <div className="bg-card/40 rounded-lg p-4 border border-border/30">
+                              <ProofVisualizer proof={proof} />
+                            </div>
+                            <button
+                              className={buttonClassName}
+                              onClick={onNextStep}
+                            >
+                              Continue to Next Step
+                            </button>
+                          </>
+                        ) : (
+                          <button
+                            className={buttonClassName}
+                            onClick={handleGenerateProof}
+                          >
+                            Generate Proof
+                          </button>
+                        )}
+                      </div>
+                    )}
+
+                    {address && transactionChain && calls.length > 0 && (
+                      <div className="space-y-4">
+                        <div className="bg-card/40 rounded-lg p-3 border border-border/30">
+                          <p className="text-sm text-muted-foreground flex items-center gap-1">
+                            Sending{" "}
+                            <span className="font-medium text-white">
+                              {amount}
+                            </span>
+                            <span>{selectedToken.icon}</span>
+                          </p>
+                        </div>
+
+                        <Transaction
+                          chainId={transactionChain}
+                          calls={calls}
+                          onStatus={handleOnStatus}
+                        >
+                          <TransactionButton className="w-full rounded-xl px-4 py-3 font-medium" />
+                          <div className="mt-3">
+                            <TransactionStatus>
+                              <div className="flex items-center justify-between bg-card/40 rounded-lg p-3 border border-border/30">
+                                <TransactionStatusLabel className="text-sm" />
+                                <TransactionStatusAction className="text-sm text-blue-400 hover:text-blue-300" />
+                              </div>
+                            </TransactionStatus>
+                          </div>
+                        </Transaction>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }

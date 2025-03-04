@@ -132,7 +132,7 @@ export default function Home() {
     {
       label: "Refund Magic Spend",
       action: handleRefundMagicSpend,
-      calls: async () => [],
+      calls: handleRefundMagicSpend,
       isTransaction: true,
     },
     {
@@ -150,67 +150,98 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#101218] text-white p-8">
-      <div className="relative">
-        <MenuIcon options={menuOptions} dstChainId={destinationChain.id} />
-        <h1 className="text-4xl font-bold text-center mb-8">RRC-7755 Demo</h1>
-        <WalletConnection />
-      </div>
-      <BalancesPanel
-        sourceChain={sourceChain}
-        destinationChain={destinationChain}
-        token={selectedToken}
-        sourceBalances={sourceChainBalances}
-        destinationBalances={destinationChainBalances}
-        currentStep={currentStep}
-        chains={chains}
-        handleSourceChainChange={handleSourceChainChange}
-        handleDestinationChainChange={handleDestinationChainChange}
-      />
-      <div className="flex flex-col lg:flex-row justify-between items-start mt-8">
-        <StepVisualizer
-          steps={steps[requestType.id][selectedToken.id]}
-          currentStep={currentStep}
-          onNextStep={handleNextStep}
-          sourceChain={sourceChain}
-          destinationChain={destinationChain}
-          requestType={requestType.id as RequestType}
-          selectedToken={selectedToken}
-          amount={+amount}
-          request={request}
-          setRequest={handleSetRequest}
-          proof={proof}
-          setProof={handleSetProof}
-        />
-        <div className="w-full lg:w-1/4">
-          <Selector
-            items={requests}
-            selected={requestType}
-            onChange={handleRequestTypeChange}
-            label="Request Type"
-            displayIcon={false}
-            disabled={currentStep > 0}
-          />
-          <Selector
-            items={tokens}
-            selected={selectedToken}
-            onChange={handleTokenChange}
-            label="Select Token"
-            displayIcon={false}
-            disabled={currentStep > 0}
-          />
-          <AmountInput
-            amount={amount}
-            onAmountChange={handleAmountChange}
-            maxAmount={
-              currentStep === 0
-                ? sourceChainBalances.fulfiller
-                : sourceChainBalances.account
-            }
-            disabled={currentStep > 0}
+    <main className="min-h-screen px-4 py-8 md:px-8 lg:px-12 animate-fade-in">
+      <div className="max-w-7xl mx-auto">
+        <div className="relative flex items-center justify-between mb-8">
+          <div className="absolute right-0 top-0">
+            <MenuIcon options={menuOptions} dstChainId={destinationChain.id} />
+          </div>
+          <div className="w-full">
+            <h1 className="text-4xl font-bold text-center mb-2 gradient-text">
+              RRC-7755 Demo
+            </h1>
+            <p className="text-center text-muted-foreground mb-6">
+              A modern cross-chain request for computation implementation
+            </p>
+            <div className="flex justify-center">
+              <WalletConnection />
+            </div>
+          </div>
+        </div>
+
+        <div className="glass-card p-6 mb-8 animate-slide-up">
+          <BalancesPanel
+            sourceChain={sourceChain}
+            destinationChain={destinationChain}
+            token={selectedToken}
+            sourceBalances={sourceChainBalances}
+            destinationBalances={destinationChainBalances}
+            currentStep={currentStep}
+            chains={chains}
+            handleSourceChainChange={handleSourceChainChange}
+            handleDestinationChainChange={handleDestinationChainChange}
           />
         </div>
+
+        <div className="flex flex-col lg:flex-row gap-8">
+          <div
+            className="glass-card p-6 w-full lg:w-3/4 animate-slide-up"
+            style={{ animationDelay: "100ms" }}
+          >
+            <StepVisualizer
+              steps={steps[requestType.id][selectedToken.id]}
+              currentStep={currentStep}
+              onNextStep={handleNextStep}
+              sourceChain={sourceChain}
+              destinationChain={destinationChain}
+              requestType={requestType.id as RequestType}
+              selectedToken={selectedToken}
+              amount={+amount}
+              request={request}
+              setRequest={handleSetRequest}
+              proof={proof}
+              setProof={handleSetProof}
+            />
+          </div>
+
+          <div
+            className="glass-card py-6 px-3 w-full lg:w-1/4 animate-slide-up"
+            style={{ animationDelay: "200ms" }}
+          >
+            <h2 className="text-xl font-semibold mb-4 gradient-text">
+              Configuration
+            </h2>
+            <div className="space-y-6">
+              <Selector
+                items={requests}
+                selected={requestType}
+                onChange={handleRequestTypeChange}
+                label="Request Type"
+                displayIcon={false}
+                disabled={currentStep > 0}
+              />
+              <Selector
+                items={tokens}
+                selected={selectedToken}
+                onChange={handleTokenChange}
+                label="Select Token"
+                displayIcon={false}
+                disabled={currentStep > 0}
+              />
+              <AmountInput
+                amount={amount}
+                onAmountChange={handleAmountChange}
+                maxAmount={
+                  currentStep === 0
+                    ? sourceChainBalances.fulfiller
+                    : sourceChainBalances.account
+                }
+                disabled={currentStep > 0}
+              />
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
+    </main>
   );
 }

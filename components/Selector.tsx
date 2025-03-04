@@ -1,6 +1,6 @@
 import { SelectionItem } from "@/utils/types/selectionItem";
 import { Check, ChevronDown } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface ChainSelectorProps {
   items: SelectionItem[];
@@ -20,10 +20,11 @@ export default function Selector({
   disabled,
 }: ChainSelectorProps) {
   const [displayDropdown, setDisplayDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
   const handleOpenDisplay = () => {
     if (disabled) return;
-    setDisplayDropdown(true);
+    setDisplayDropdown(!displayDropdown);
   };
 
   const handleSelection = (id: number) => {
@@ -31,51 +32,72 @@ export default function Selector({
     onChange(id);
   };
 
-  const selectionClassName = `w-full h-10 ${
-    disabled ? "bg-gray-500" : "bg-white"
-  } rounded-md flex items-center justify-between px-4 ${
-    disabled ? "cursor-not-allowed" : "cursor-pointer"
-  }`;
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
+        setDisplayDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
-    <>
-      {displayDropdown && (
-        <div
-          className="absolute inset-0 bg-black opacity-50 z-10"
-          onClick={() => setDisplayDropdown(false)}
-        />
-      )}
-      <div className="mb-4 relative">
-        <label className="block text-sm font-medium mb-2">{label}</label>
-        <div className={selectionClassName} onClick={handleOpenDisplay}>
-          <div className="w-full text-black">
-            {displayIcon && selected.icon} {selected.name}
-          </div>
-          <ChevronDown className="h-4 w-4 opacity-50 text-black" />
+    <div className="mb-4 relative" ref={dropdownRef}>
+      <label className="block text-sm font-medium mb-2 text-muted-foreground">
+        {label}
+      </label>
+      <div
+        className={`w-full h-10 bg-card/50 border border-border/50 rounded-lg flex items-center justify-between px-3 transition-all ${
+          disabled
+            ? "opacity-60 cursor-not-allowed"
+            : "cursor-pointer hover:border-border"
+        }`}
+        onClick={handleOpenDisplay}
+      >
+        <div className="flex items-center gap-2 text-foreground">
+          {displayIcon && <span className="text-lg">{selected.icon}</span>}
+          <span>{selected.name}</span>
         </div>
-        {displayDropdown && (
-          <>
-            <div className="bg-white rounded-md text-black absolute w-full mt-1 overflow-hidden z-20">
-              {items.map((item) => (
-                <div key={item.id}>
-                  <div
-                    className="flex items-center cursor-pointer px-1 py-1 hover:bg-gray-100"
-                    onClick={() => handleSelection(item.id)}
-                  >
-                    <div className="w-6 flex items-center justify-center h-full">
-                      {item.id === selected.id && (
-                        <Check className="h-4 w-4 text-black" />
-                      )}
-                    </div>
-                    {displayIcon && <span className="mr-2">{item.icon}</span>}
-                    {item.name}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </>
-        )}
+        <ChevronDown
+          className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${
+            displayDropdown ? "transform rotate-180" : ""
+          }`}
+        />
       </div>
-    </>
+
+      {displayDropdown && (
+        <div className="absolute w-full mt-1 z-20 animate-fade-in">
+          <div className="bg-card border border-border/50 rounded-lg shadow-lg overflow-hidden max-h-60 overflow-y-auto">
+            {items.map((item) => (
+              <div
+                key={item.id}
+                className={`flex items-center px-3 py-2 cursor-pointer transition-colors ${
+                  item.id === selected.id
+                    ? "bg-primary/10 text-primary"
+                    : "hover:bg-card/80 text-foreground"
+                }`}
+                onClick={() => handleSelection(item.id)}
+              >
+                <div className="w-6 flex items-center justify-center">
+                  {item.id === selected.id && <Check className="h-4 w-4" />}
+                </div>
+                {displayIcon && (
+                  <span className="mr-2 text-lg">{item.icon}</span>
+                )}
+                <span>{item.name}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }

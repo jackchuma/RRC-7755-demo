@@ -278,7 +278,7 @@ export default function Home() {
             destinationChain={destinationChain}
             handleSourceChainChange={handleSourceChainChange}
             handleDestinationChainChange={handleDestinationChainChange}
-            selectedToken={selectedToken.id}
+            selectedToken={selectedToken}
             toggleMintModal={toggleMintModal}
             chains={chains}
           />

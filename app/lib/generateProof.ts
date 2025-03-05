@@ -195,29 +195,24 @@ async function getL2Block(
 }> {
   console.log("getL2Block");
 
+  if (usingHashi) {
+    // NOTE: This is only for a proof of concept. We have a mock shoyu bashi contract that allows us to directly set the block hash for the l2 block number.
+    // In production, more sophisticated logic will be needed to determine the latest block number accounted for in the Hashi system.
+    return { l2Block: await dstChain.publicClient.getBlock() };
+  }
+
   switch (dstChain.chainId) {
     case arbitrumSepolia.id:
-      return await getArbitrumSepoliaBlock(
-        usingHashi,
-        l1Chain,
-        dstChain,
-        blockNumber
-      );
+      return await getArbitrumSepoliaBlock(l1Chain, dstChain, blockNumber);
     case baseSepolia.id:
     case optimismSepolia.id:
-      return await getOptimismSepoliaBlock(
-        usingHashi,
-        dstChain,
-        l1Chain,
-        blockNumber
-      );
+      return await getOptimismSepoliaBlock(dstChain, l1Chain, blockNumber);
     default:
       throw new Error("Received unknown chain in getL2Block");
   }
 }
 
 async function getArbitrumSepoliaBlock(
-  usingHashi: boolean,
   l1Chain: ChainConfig,
   dstChain: ChainConfig,
   l1BlockNumber?: bigint
@@ -229,10 +224,8 @@ async function getArbitrumSepoliaBlock(
 }> {
   console.log("getArbitrumSepoliaBlock");
 
-  if (!usingHashi) {
-    if (!l1BlockNumber) {
-      throw new Error("Block number is required");
-    }
+  if (!l1BlockNumber) {
+    throw new Error("Block number is required");
   }
 
   // Need to get blockHash instead
@@ -301,17 +294,11 @@ async function request(url: string): Promise<any> {
 }
 
 async function getOptimismSepoliaBlock(
-  usingHashi: boolean,
   dstChain: ChainConfig,
   l1Chain: ChainConfig,
   blockNumber?: bigint
 ): Promise<{ l2Block: Block }> {
-  const l2BlockNumber = await getL2BlockNumber(
-    usingHashi,
-    dstChain,
-    l1Chain,
-    blockNumber
-  );
+  const l2BlockNumber = await getL2BlockNumber(dstChain, l1Chain, blockNumber);
   const l2Block = await dstChain.publicClient.getBlock({
     blockNumber: l2BlockNumber,
   });
@@ -319,17 +306,10 @@ async function getOptimismSepoliaBlock(
 }
 
 async function getL2BlockNumber(
-  usingHashi: boolean,
   dstChain: ChainConfig,
   l1Chain: ChainConfig,
   l1BlockNumber?: bigint
 ): Promise<bigint> {
-  if (usingHashi) {
-    // NOTE: This is only for a proof of concept. We have a mock shoyu bashi contract that allows us to directly set the block hash for the l2 block number.
-    // In production, more sophisticated logic will be needed to determine the latest block number accounted for in the Hashi system.
-    return await dstChain.publicClient.getBlockNumber();
-  }
-
   if (!l1BlockNumber) {
     throw new Error("Block number is required");
   }
@@ -357,17 +337,8 @@ function deriveRRC7755VerifierStorageSlot(requestHash: Address): Address {
 
 async function getStorageProofs(opts: GetStorageProofsInput): Promise<Proofs> {
   console.log("getStorageProofs");
-  const {
-    l1BlockNumber,
-    l2Block,
-    l2Slot,
-    parentAssertionHash,
-    afterInboxBatchAcc,
-    assertion,
-    l1Chain,
-    dstChain,
-    usingHashi,
-  } = opts;
+  const { l1BlockNumber, l2Block, l2Slot, l1Chain, dstChain, usingHashi } =
+    opts;
 
   const calls = [
     dstChain.publicClient.getProof({

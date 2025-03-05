@@ -38,7 +38,7 @@ export default {
       paymaster: "0x5fafc58be8c07d155176035c17a44f8ea1d7bf46",
       inbox: "0x9e433ca69c6760b49b2dea488efa671d43bbeb49",
       entryPoint: "0x0000000071727De22E5E9d8BAf0edAc6f37da032",
-      shoyuBashi: "0x6602dc9b6bd964C2a11BBdA9B2275308D1Bbc14f",
+      shoyuBashi: "0x87ae0ec04Ba463f426e7B3f0B54ecBaA84e0a0A2",
       smartAccount: "0x0AFD6E86309eDE7f89d6B9CADE1E5eC113899577",
       mockAccountTracker: "0x2CD13Cc33eA00AE065906e5D75c9ebB042c02Cc8",
       outboxContracts: {
@@ -66,7 +66,7 @@ export default {
       paymaster: "0x99b176b822b3d3ff9414a821386f343d929f47a3",
       inbox: "0x45593691657df351e8487f295b5b83f82966b6db",
       entryPoint: "0x0000000071727De22E5E9d8BAf0edAc6f37da032",
-      shoyuBashi: "0x7237bb8d1d38DF8b473b5A38eD90088AF162ad8e",
+      shoyuBashi: "0x87ae0ec04Ba463f426e7B3f0B54ecBaA84e0a0A2",
       smartAccount: "0x0AFD6E86309eDE7f89d6B9CADE1E5eC113899577",
       mockAccountTracker: "0x2CD13Cc33eA00AE065906e5D75c9ebB042c02Cc8",
       outboxContracts: {

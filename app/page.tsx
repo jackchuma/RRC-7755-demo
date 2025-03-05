@@ -1,19 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import StepVisualizer from "../components/StepVisualizer";
 import WalletConnection from "../components/WalletConnection";
 import Selector from "../components/Selector";
 import AmountInput from "../components/AmountInput";
 import MenuIcon from "../components/MenuIcon";
+import MintUSDCModal from "../components/MintUSDCModal";
+import BalancesPanel from "../components/BalancesPanel";
 import { Request, RequestType } from "@/utils/types/request";
 import { TokenType } from "@/utils/types/tokenType";
 import { steps } from "@/config/steps";
 import { ProofType } from "@/utils/types/proof";
 import useBalance from "@/hooks/useBalance";
 import { tokens } from "@/config/tokens";
-import BalancesPanel from "@/components/BalancesPanel";
 import {
   buildWithdrawMagicSpendCall,
   WithdrawCallResponse,
@@ -21,20 +22,13 @@ import {
 import { useAccount } from "wagmi";
 import { buildWithdrawGasCall } from "./lib/buildWithdrawGasCall";
 import { buildWithdrawAccountCall } from "./lib/buildWithdrawAccountCall";
+import { SelectionItem } from "@/utils/types/selectionItem";
+import { requests } from "@/config/requests";
 
-export const chains = [
+export const chains: SelectionItem[] = [
   { id: 84532, name: "Base Sepolia", icon: "🔷" },
   { id: 11155420, name: "Optimism Sepolia", icon: "🔴" },
   { id: 421614, name: "Arbitrum Sepolia", icon: "🔵" },
-];
-
-const requests = [
-  { id: RequestType.Standard, name: "Standard Request", icon: "" },
-  {
-    id: RequestType.SmartAccount,
-    name: "4337 Smart Account Request",
-    icon: "",
-  },
 ];
 
 export default function Home() {
@@ -47,12 +41,33 @@ export default function Home() {
   const [requestType, setRequestType] = useState(requests[0]);
   const [selectedToken, setSelectedToken] = useState(tokens[0]);
   const [amount, setAmount] = useState("");
+  const [showWelcomeBanner, setShowWelcomeBanner] = useState(true);
+  const [isMintModalOpen, setIsMintModalOpen] = useState(false);
+  const [hasUSDC, setHasUSDC] = useState(false);
 
   const sourceChainBalances = useBalance(sourceChain.id, selectedToken);
   const destinationChainBalances = useBalance(
     destinationChain.id,
     selectedToken
   );
+
+  // Check if user has USDC when address changes
+  useEffect(() => {
+    if (!address) return;
+
+    const checkUSDC = async () => {
+      try {
+        const result = await fetch(`/api/check-usdc?address=${address}`);
+        const data = await result.json();
+        setHasUSDC(data.hasUSDC);
+      } catch (error) {
+        console.error("Error checking USDC balance:", error);
+        setHasUSDC(false);
+      }
+    };
+
+    checkUSDC();
+  }, [address]);
 
   const handleNextStep = () => {
     const maxSteps = steps[requestType.id][selectedToken.id].length;
@@ -200,9 +215,44 @@ export default function Home() {
     },
   ];
 
+  const toggleMintModal = (open: boolean) => {
+    setIsMintModalOpen(open);
+  };
+
   return (
-    <main className="min-h-screen px-4 py-8 md:px-8 lg:px-12 animate-fade-in">
-      <div className="max-w-7xl mx-auto">
+    <main className="flex min-h-screen flex-col items-center justify-between p-4 md:p-8 lg:p-12">
+      {address && showWelcomeBanner && !hasUSDC && (
+        <div className="w-full max-w-5xl mb-6 p-4 bg-primary/10 border border-primary/20 rounded-lg flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="bg-primary/20 p-2 rounded-full">
+              <span className="text-xl">👋</span>
+            </div>
+            <div>
+              <h3 className="font-medium">Welcome to the RRC-7755 Demo!</h3>
+              <p className="text-sm text-muted-foreground">
+                New to the site? You'll need USDC to interact with the features.
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setIsMintModalOpen(true)}
+              className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors"
+            >
+              Mint USDC
+            </button>
+            <button
+              onClick={() => setShowWelcomeBanner(false)}
+              className="p-2 text-muted-foreground hover:text-foreground"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* <div className="max-w-7xl mx-auto"> */}
+      <div className="w-full max-w-7xl flex flex-col gap-8">
         <div className="relative flex items-center justify-between mb-8">
           <div className="absolute right-0 top-0">
             <MenuIcon options={menuOptions} />
@@ -212,7 +262,7 @@ export default function Home() {
               RRC-7755 Demo
             </h1>
             <p className="text-center text-muted-foreground mb-6">
-              A modern cross-chain request for computation implementation
+              A demo for sending cross-chain calls using RRC-7755
             </p>
             <div className="flex justify-center">
               <WalletConnection />
@@ -222,15 +272,15 @@ export default function Home() {
 
         <div className="glass-card p-6 mb-8 animate-slide-up">
           <BalancesPanel
+            sourceChainBalances={sourceChainBalances}
+            destinationChainBalances={destinationChainBalances}
             sourceChain={sourceChain}
             destinationChain={destinationChain}
-            token={selectedToken}
-            sourceBalances={sourceChainBalances}
-            destinationBalances={destinationChainBalances}
-            currentStep={currentStep}
-            chains={chains}
             handleSourceChainChange={handleSourceChainChange}
             handleDestinationChainChange={handleDestinationChainChange}
+            selectedToken={selectedToken.id}
+            toggleMintModal={toggleMintModal}
+            chains={chains}
           />
         </div>
 
@@ -293,6 +343,11 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      <MintUSDCModal
+        isOpen={isMintModalOpen}
+        onClose={() => setIsMintModalOpen(false)}
+      />
     </main>
   );
 }

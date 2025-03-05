@@ -1,6 +1,9 @@
 import { TokenType } from "@/utils/types/tokenType";
 import { Address } from "viem";
 
+export const usdcAddress =
+  "0x8c9924434AfFc441BD53E30909402A5C15283aE6" as Address;
+
 export const tokens = [
   {
     id: TokenType.ETH,
@@ -12,6 +15,6 @@ export const tokens = [
     id: TokenType.USDC,
     name: "USDC",
     icon: "USDC",
-    address: "0x8c9924434AfFc441BD53E30909402A5C15283aE6" as Address,
+    address: usdcAddress,
   },
 ];

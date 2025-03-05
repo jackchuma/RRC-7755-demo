@@ -42,7 +42,7 @@ export default function AmountInput({
           min="0"
           max={maxAmount}
           step="0.000001"
-          className={`w-full h-10 px-3 py-2 bg-card/50 border border-border/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all ${
+          className={`w-full h-10 px-3 py-2 pr-16 bg-card/50 border border-border/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all ${
             disabled ? "opacity-60 cursor-not-allowed" : "hover:border-border"
           }`}
           disabled={disabled}
@@ -52,7 +52,7 @@ export default function AmountInput({
           type="button"
           onClick={handleSetMax}
           disabled={disabled}
-          className={`absolute right-8 top-1/2 -translate-y-1/2 text-xs font-medium px-2 py-1 rounded bg-primary/20 text-primary-foreground transition-all ${
+          className={`absolute right-3 top-1/2 -translate-y-1/2 text-xs font-medium px-2 py-1 rounded bg-primary/20 text-primary-foreground transition-all ${
             disabled
               ? "opacity-50 cursor-not-allowed"
               : "hover:bg-primary/30 active:scale-95"

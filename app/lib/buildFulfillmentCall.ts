@@ -14,13 +14,13 @@ export async function buildFulfillmentCall(
   address: Address
 ): Promise<BuildCallsResponse> {
   console.log("buildFulfillmentCall");
-  const args: any = [
-    req.srcChain,
-    req.sender,
-    req.payload,
-    req.attributes,
-    address,
-  ];
+  const args: readonly [
+    `0x${string}`,
+    `0x${string}`,
+    `0x${string}`,
+    readonly `0x${string}`[],
+    `0x${string}`
+  ] = [req.srcChain, req.sender, req.payload, req.attributes, address];
 
   let data = encodeFunctionData({ abi: Inbox, functionName: "fulfill", args });
 

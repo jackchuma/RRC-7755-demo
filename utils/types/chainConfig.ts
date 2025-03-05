@@ -1,4 +1,4 @@
-import { Address } from "viem";
+import { Address, PublicClient } from "viem";
 
 export enum Provers {
   Arbitrum = "Arbitrum",
@@ -21,7 +21,7 @@ export type ChainConfig = {
   chainId: number;
   l2Oracle: Address;
   l2OracleStorageKey: Address;
-  publicClient: any;
+  publicClient: PublicClient;
   contracts: Contracts;
   targetProver: Provers;
   exposesL1State: boolean;

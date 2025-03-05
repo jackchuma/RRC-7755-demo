@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from "react";
 import WithdrawalModal from "./WithdrawalModal";
-import { chains } from "@/app/page";
 import { WithdrawCallResponse } from "@/app/lib/buildWithdrawMagicSpendCall";
 import { Call } from "@/utils/types/call";
+import { SelectionItem } from "@/utils/types/selectionItem";
 
 interface MenuOption {
   label: string;
@@ -13,9 +13,10 @@ interface MenuOption {
 
 interface MenuIconProps {
   options: MenuOption[];
+  chains: SelectionItem[];
 }
 
-const MenuIcon: React.FC<MenuIconProps> = ({ options }) => {
+const MenuIcon: React.FC<MenuIconProps> = ({ options, chains }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState<MenuOption | null>(null);

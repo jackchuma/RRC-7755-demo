@@ -14,6 +14,13 @@ pnpm install
 bun install
 ```
 
+Next, add a `.env` file with the following:
+
+```txt
+NEXT_PUBLIC_ONCHAINKIT_PROJECT_NAME="RRC-7755 Demo"
+NEXT_PUBLIC_ONCHAINKIT_WALLET_CONFIG=eoaOnly
+```
+
 Next, run the development server:
 
 ```bash

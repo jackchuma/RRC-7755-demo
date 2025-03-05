@@ -146,7 +146,7 @@ const MenuIcon: React.FC<MenuIconProps> = ({ options }) => {
           title={selectedOption.label}
           amount={withdrawalAmount}
           chains={chains}
-          initialChainId={selectedChainId}
+          selectedChain={selectedChainId}
           onChainChange={handleChainChange}
           onWithdraw={handleWithdrawSuccess}
           calls={calls}

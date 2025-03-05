@@ -5,7 +5,7 @@ import {
   TransactionButton,
 } from "@coinbase/onchainkit/transaction";
 import { X } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import Selector from "./Selector";
 
 interface WithdrawalModalProps {
@@ -14,7 +14,7 @@ interface WithdrawalModalProps {
   title: string;
   amount: number;
   chains: SelectionItem[];
-  initialChainId: number;
+  selectedChain: number;
   onChainChange: (chainId: number) => void;
   onWithdraw: () => void;
   calls: Call[];
@@ -26,21 +26,18 @@ export default function WithdrawalModal({
   title,
   amount,
   chains,
-  initialChainId,
+  selectedChain,
   onChainChange,
   onWithdraw,
   calls,
 }: WithdrawalModalProps) {
-  const [selectedChain, setSelectedChain] = useState<SelectionItem>(
-    chains.find((chain) => chain.id === initialChainId) || chains[0]
-  );
   const modalRef = useRef<HTMLDivElement>(null);
+  const chain = chains.find((chain) => chain.id === selectedChain) || chains[0];
 
   // Handle chain selection
   const handleChainChange = (chainId: number) => {
     const newChain = chains.find((chain) => chain.id === chainId);
     if (newChain) {
-      setSelectedChain(newChain);
       onChainChange(chainId);
     }
   };
@@ -97,7 +94,7 @@ export default function WithdrawalModal({
           <div className="mb-6">
             <Selector
               items={chains}
-              selected={selectedChain}
+              selected={chain}
               onChange={handleChainChange}
               label="Select Chain"
               displayIcon={true}
@@ -114,7 +111,7 @@ export default function WithdrawalModal({
             </button>
 
             <Transaction
-              chainId={selectedChain.id}
+              chainId={chain.id}
               calls={calls}
               onSuccess={onWithdraw}
             >

@@ -12,6 +12,6 @@ export type Request = {
   dstChain: Hex;
   receiver: Hex;
   payload: Hex;
-  attributes: Hex[];
+  attributes: readonly Hex[];
   requestType: RequestType;
 };

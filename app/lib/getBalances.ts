@@ -6,7 +6,7 @@ import Paymaster from "@/abis/Paymaster";
 import chains from "@/config/chains";
 import { ChainConfig } from "@/utils/types/chainConfig";
 import { Token, TokenType } from "@/utils/types/tokenType";
-import { Address, formatEther } from "viem";
+import { Abi, Address, formatEther } from "viem";
 
 export type Balances = {
   account: number;
@@ -14,6 +14,13 @@ export type Balances = {
   outbox: number;
   paymaster: number;
   entryPoint: number;
+};
+
+type MulticallContract = {
+  abi: Abi;
+  functionName: string;
+  args?: unknown[];
+  address: Address;
 };
 
 export type GetBalancesResponse = {
@@ -45,7 +52,7 @@ async function getETHBalances(
 ): Promise<Balances> {
   const { publicClient } = chain;
 
-  const contracts: any = [
+  const contracts: MulticallContract[] = [
     {
       address: chain.contracts.mockAccountTracker,
       abi: MockAccountTracker,
@@ -85,37 +92,38 @@ async function getETHBalances(
 
   const calls = [publicClient.multicall({ contracts })];
 
+  let fulfillerBalance: bigint = 0n;
+  let outboxBalance: bigint = 0n;
+
   if (token.id === TokenType.ETH) {
-    calls.push(
+    // Handle ETH balances separately
+    [fulfillerBalance, outboxBalance] = await Promise.all([
       publicClient.getBalance({ address }),
       publicClient.getBalance({
         address: chain.contracts.outboxContracts.Hashi,
-      })
-    );
+      }),
+    ]);
   }
 
-  const [multiCallResults, ...otherResults] = await Promise.all(calls);
+  const [multiCallResults] = await Promise.all(calls);
   const [
     accountResult,
     paymasterResult,
     entryPointResult,
     ...otherMulticallResults
   ] = multiCallResults;
-  let fulfillerBalance, outboxBalance;
 
-  if (token.id === TokenType.ETH) {
-    [fulfillerBalance, outboxBalance] = otherResults;
-  } else {
+  if (token.id !== TokenType.ETH) {
     const [fulfillerResult, outboxResult] = otherMulticallResults;
-    fulfillerBalance = fulfillerResult.result;
-    outboxBalance = outboxResult.result;
+    fulfillerBalance = fulfillerResult.result as bigint;
+    outboxBalance = outboxResult.result as bigint;
   }
 
   return {
-    account: +formatEther(accountResult.result),
+    account: +formatEther(accountResult.result as bigint),
     fulfiller: +formatEther(fulfillerBalance),
     outbox: +formatEther(outboxBalance),
-    paymaster: +formatEther(paymasterResult.result),
-    entryPoint: +formatEther(entryPointResult.result),
+    paymaster: +formatEther(paymasterResult.result as bigint),
+    entryPoint: +formatEther(entryPointResult.result as bigint),
   };
 }

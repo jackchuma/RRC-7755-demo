@@ -1,5 +1,4 @@
 import { useAccount } from "wagmi";
-import { useCallback } from "react";
 import {
   LifecycleStatus,
   Transaction,
@@ -17,7 +16,6 @@ import { Step, TransactionTarget } from "@/utils/types/step";
 import ProofVisualizer from "./ProofVisualizer";
 import { ProofType } from "@/utils/types/proof";
 import { generateProof } from "@/app/lib/generateProof";
-import { sepolia } from "viem/chains";
 import { StepId } from "@/config/steps";
 
 interface StepVisualizerProps {
@@ -62,24 +60,17 @@ export default function StepVisualizer({
   });
   const { address } = useAccount();
 
-  const handleOnStatus = useCallback(
-    (status: LifecycleStatus) => {
-      if (status.statusName === "success") {
-        onNextStep();
-      }
-    },
-    [currentStep]
-  );
-
-  const handleGenerateProof = async () => {
-    await genProof(sourceChain.id, destinationChain.id, request);
+  const handleOnStatus = (status: LifecycleStatus) => {
+    if (status.statusName === "success") {
+      onNextStep();
+    }
   };
 
-  const genProof = async (
-    srcChainId: number,
-    dstChainId: number,
-    req?: Request
-  ) => {
+  const handleGenerateProof = async () => {
+    await genProof(destinationChain.id, request);
+  };
+
+  const genProof = async (dstChainId: number, req?: Request) => {
     if (!req) {
       setProof(undefined);
       return;
@@ -87,13 +78,7 @@ export default function StepVisualizer({
 
     const timestampCutoff = 0; // TODO: add timestamp cutoff to req
 
-    const res = await generateProof(
-      srcChainId,
-      sepolia.id,
-      dstChainId,
-      req.id,
-      timestampCutoff
-    );
+    const res = await generateProof(dstChainId, req.id, timestampCutoff);
 
     console.log("Proof generation res", res);
     if (res.success) {

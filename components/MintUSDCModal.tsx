@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useAccount } from "wagmi";
-import { chains } from "@/app/page";
 import {
   Transaction,
   TransactionButton,
@@ -8,13 +7,19 @@ import {
 import { usdcAddress } from "@/config/tokens";
 import { encodeFunctionData, parseEther } from "viem";
 import MockToken from "@/abis/MockToken";
+import { SelectionItem } from "@/utils/types/selectionItem";
 
 interface MintUSDCModalProps {
   isOpen: boolean;
   onClose: () => void;
+  chains: SelectionItem[];
 }
 
-export default function MintUSDCModal({ isOpen, onClose }: MintUSDCModalProps) {
+export default function MintUSDCModal({
+  isOpen,
+  onClose,
+  chains,
+}: MintUSDCModalProps) {
   const { address } = useAccount();
   const [selectedChain, setSelectedChain] = useState(chains[0]);
   const [amount, setAmount] = useState("100");

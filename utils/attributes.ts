@@ -15,8 +15,11 @@ const inboxAttributeSelector = "0xbd362374";
 export default class Attributes {
   private attributes: Hex[];
 
-  constructor(startingAttributes: Hex[] = []) {
-    this.attributes = startingAttributes;
+  constructor(startingAttributes: readonly Hex[] = []) {
+    this.attributes = [];
+    for (const attr of startingAttributes) {
+      this.attributes.push(attr);
+    }
   }
 
   list(): Hex[] {

@@ -25,7 +25,7 @@ import { buildWithdrawAccountCall } from "./lib/buildWithdrawAccountCall";
 import { SelectionItem } from "@/utils/types/selectionItem";
 import { requests } from "@/config/requests";
 
-export const chains: SelectionItem[] = [
+const chains: SelectionItem[] = [
   { id: 84532, name: "Base Sepolia", icon: "🔷" },
   { id: 11155420, name: "Optimism Sepolia", icon: "🔴" },
   { id: 421614, name: "Arbitrum Sepolia", icon: "🔵" },
@@ -230,7 +230,7 @@ export default function Home() {
             <div>
               <h3 className="font-medium">Welcome to the RRC-7755 Demo!</h3>
               <p className="text-sm text-muted-foreground">
-                New to the site? You'll need USDC to interact with the features.
+                New to the site? You can mint mock USDC to test the demo.
               </p>
             </div>
           </div>
@@ -255,7 +255,7 @@ export default function Home() {
       <div className="w-full max-w-7xl flex flex-col gap-8">
         <div className="relative flex items-center justify-between mb-8">
           <div className="absolute right-0 top-0">
-            <MenuIcon options={menuOptions} />
+            <MenuIcon options={menuOptions} chains={chains} />
           </div>
           <div className="w-full">
             <h1 className="text-4xl font-bold text-center mb-2 gradient-text">
@@ -347,6 +347,7 @@ export default function Home() {
       <MintUSDCModal
         isOpen={isMintModalOpen}
         onClose={() => setIsMintModalOpen(false)}
+        chains={chains}
       />
     </main>
   );

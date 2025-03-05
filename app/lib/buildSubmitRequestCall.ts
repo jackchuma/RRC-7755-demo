@@ -27,9 +27,16 @@ import { calculateRewardAmount } from "@/utils/calculateRewardAmount";
 import MockAccountTracker from "@/abis/MockAccountTracker";
 import MockToken from "@/abis/MockToken";
 
+type Args = readonly [
+  `0x${string}`,
+  `0x${string}`,
+  `0x${string}`,
+  readonly `0x${string}`[]
+];
+
 export type BuildSubmitRequestCallResponse = {
   success: boolean;
-  data: { id: Hex; calls: Call[]; args: any; sender: Hex };
+  data: { id: Hex; calls: Call[]; args: Args; sender: Hex };
 };
 
 type OnchainCall = {
@@ -94,7 +101,7 @@ export async function buildSubmitRequestCall(
   );
 
   const address = srcChain.contracts.outboxContracts[outboxName];
-  const args: any = [
+  const args: Args = [
     dstChainIdBytes32,
     addressToBytes32(receiver),
     payload,
@@ -358,6 +365,6 @@ async function getEntryPointNonce(
     address: chain.contracts.entryPoint,
     abi: EntryPoint,
     functionName: "getNonce",
-    args: [account, 0],
+    args: [account, BigInt(0)],
   });
 }

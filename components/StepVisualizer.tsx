@@ -216,23 +216,17 @@ export default function StepVisualizer({
                     )}
 
                     {address && transactionChain && calls.length > 0 && (
-                      <div className="space-y-4">
-                        <Transaction
-                          chainId={transactionChain}
-                          calls={calls}
-                          onStatus={handleOnStatus}
-                        >
-                          <TransactionButton className="w-full rounded-xl px-4 py-3 font-medium" />
-                          <div className="mt-3">
-                            <TransactionStatus>
-                              <div className="flex items-center justify-between bg-card/40 rounded-lg p-3 border border-border/30">
-                                <TransactionStatusLabel className="text-sm" />
-                                <TransactionStatusAction className="text-sm text-blue-400 hover:text-blue-300" />
-                              </div>
-                            </TransactionStatus>
-                          </div>
-                        </Transaction>
-                      </div>
+                      <Transaction
+                        chainId={transactionChain}
+                        calls={calls}
+                        onStatus={handleOnStatus}
+                      >
+                        <TransactionButton />
+                        <TransactionStatus>
+                          <TransactionStatusLabel />
+                          <TransactionStatusAction />
+                        </TransactionStatus>
+                      </Transaction>
                     )}
                   </div>
                 )}

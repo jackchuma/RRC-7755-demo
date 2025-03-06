@@ -41,7 +41,7 @@ export default function AmountInput({
           placeholder="Enter amount"
           min="0"
           max={maxAmount}
-          step="0.000001"
+          step="0.0001"
           className={`w-full h-10 px-3 py-2 pr-16 bg-card/50 border border-border/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary/50 transition-all ${
             disabled ? "opacity-60 cursor-not-allowed" : "hover:border-border"
           }`}

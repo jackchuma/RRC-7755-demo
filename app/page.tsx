@@ -45,10 +45,15 @@ export default function Home() {
   const [isMintModalOpen, setIsMintModalOpen] = useState(false);
   const [hasUSDC, setHasUSDC] = useState(false);
 
-  const sourceChainBalances = useBalance(sourceChain.id, selectedToken);
+  const sourceChainBalances = useBalance(
+    sourceChain.id,
+    selectedToken,
+    currentStep
+  );
   const destinationChainBalances = useBalance(
     destinationChain.id,
-    selectedToken
+    selectedToken,
+    currentStep
   );
 
   // Check if user has USDC when address changes

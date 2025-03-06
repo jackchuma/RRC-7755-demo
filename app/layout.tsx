@@ -18,7 +18,7 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: process.env.NEXT_PUBLIC_ONCHAINKIT_PROJECT_NAME || "RRC-7755 Demo",
-  description: "A modern and elegant demo for RRC-7755 standard",
+  description: "A demo for sending cross-chain calls using RRC-7755",
 };
 
 export default function RootLayout({

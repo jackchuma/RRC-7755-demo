@@ -9,6 +9,7 @@ interface ChainSelectorProps {
   label: string;
   displayIcon: boolean;
   disabled: boolean;
+  disabledItems?: number[];
 }
 
 export default function Selector({
@@ -18,6 +19,7 @@ export default function Selector({
   label,
   displayIcon,
   disabled,
+  disabledItems = [],
 }: ChainSelectorProps) {
   const [displayDropdown, setDisplayDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -28,6 +30,8 @@ export default function Selector({
   };
 
   const handleSelection = (id: number) => {
+    if (disabledItems.includes(id)) return;
+
     setDisplayDropdown(false);
     onChange(id);
   };
@@ -79,12 +83,16 @@ export default function Selector({
             {items.map((item) => (
               <div
                 key={item.id}
-                className={`flex items-center px-3 py-2 cursor-pointer transition-colors ${
+                className={`flex items-center px-3 py-2 transition-colors ${
                   item.id === selected.id
                     ? "bg-primary/10 text-primary"
-                    : "hover:bg-card/80 text-foreground"
+                    : disabledItems.includes(item.id)
+                    ? "opacity-50 text-muted-foreground"
+                    : "hover:bg-card/80 text-foreground cursor-pointer"
                 }`}
-                onClick={() => handleSelection(item.id)}
+                onClick={() =>
+                  !disabledItems.includes(item.id) && handleSelection(item.id)
+                }
               >
                 <div className="w-6 flex items-center justify-center">
                   {item.id === selected.id && <Check className="h-4 w-4" />}
@@ -93,6 +101,11 @@ export default function Selector({
                   <span className="mr-2 text-lg">{item.icon}</span>
                 )}
                 <span>{item.name}</span>
+                {disabledItems.includes(item.id) && (
+                  <span className="ml-auto text-xs text-muted-foreground italic">
+                    Cannot select same chain
+                  </span>
+                )}
               </div>
             ))}
           </div>

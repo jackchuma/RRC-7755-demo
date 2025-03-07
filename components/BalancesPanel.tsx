@@ -61,6 +61,7 @@ export default function BalancesPanel({
               label=""
               displayIcon={true}
               disabled={false}
+              disabledItems={[destinationChain.id]}
             />
           </div>
 
@@ -75,6 +76,7 @@ export default function BalancesPanel({
               label=""
               displayIcon={true}
               disabled={false}
+              disabledItems={[sourceChain.id]}
             />
           </div>
         </div>
@@ -85,11 +87,13 @@ export default function BalancesPanel({
         <BalanceCard
           balances={sourceChainBalances}
           token={selectedToken.icon}
+          isSource={true}
         />
 
         <BalanceCard
           balances={destinationChainBalances}
           token={selectedToken.icon}
+          isSource={false}
         />
       </div>
     </div>
@@ -99,9 +103,10 @@ export default function BalancesPanel({
 interface BalanceCardProps {
   balances: Balances;
   token: string;
+  isSource: boolean;
 }
 
-function BalanceCard({ balances, token }: BalanceCardProps) {
+function BalanceCard({ balances, token, isSource }: BalanceCardProps) {
   return (
     <div className="bg-card/60 border border-border/40 rounded-lg p-4 shadow-sm hover:shadow-md transition-all">
       <div className="grid grid-cols-2 gap-2">
@@ -117,24 +122,30 @@ function BalanceCard({ balances, token }: BalanceCardProps) {
           colorClass="bg-purple-500/10 text-purple-500 border-purple-500/20"
           token={token}
         />
-        <BalanceItem
-          label="Outbox"
-          value={balances.outbox}
-          colorClass="bg-green-500/10 text-green-500 border-green-500/20"
-          token={token}
-        />
-        <BalanceItem
-          label="Paymaster"
-          value={balances.paymaster}
-          colorClass="bg-orange-500/10 text-orange-500 border-orange-500/20"
-          token={token}
-        />
-        <BalanceItem
-          label="EntryPoint"
-          value={balances.entryPoint}
-          colorClass="bg-red-500/10 text-red-500 border-red-500/20"
-          token={token}
-        />
+        {isSource && (
+          <BalanceItem
+            label="Outbox"
+            value={balances.outbox}
+            colorClass="bg-green-500/10 text-green-500 border-green-500/20"
+            token={token}
+          />
+        )}
+        {!isSource && (
+          <>
+            <BalanceItem
+              label="Paymaster"
+              value={balances.paymaster}
+              colorClass="bg-orange-500/10 text-orange-500 border-orange-500/20"
+              token={token}
+            />
+            <BalanceItem
+              label="EntryPoint"
+              value={balances.entryPoint}
+              colorClass="bg-red-500/10 text-red-500 border-red-500/20"
+              token="ETH"
+            />
+          </>
+        )}
       </div>
     </div>
   );

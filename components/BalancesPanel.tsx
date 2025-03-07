@@ -133,7 +133,7 @@ function BalanceCard({ balances, token }: BalanceCardProps) {
           label="EntryPoint"
           value={balances.entryPoint}
           colorClass="bg-red-500/10 text-red-500 border-red-500/20"
-          token={token}
+          token="ETH"
         />
       </div>
     </div>

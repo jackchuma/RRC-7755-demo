@@ -7,6 +7,7 @@ import {
   TransactionStatusAction,
   TransactionStatusLabel,
 } from "@coinbase/onchainkit/transaction";
+import { useState } from "react";
 
 import { Request, RequestType } from "@/utils/types/request";
 import { SelectionItem } from "@/utils/types/selectionItem";
@@ -59,6 +60,7 @@ export default function StepVisualizer({
     proof,
   });
   const { address } = useAccount();
+  const [hoveredStep, setHoveredStep] = useState<number | null>(null);
 
   const handleOnStatus = (status: LifecycleStatus) => {
     if (status.statusName === "success") {
@@ -133,6 +135,8 @@ export default function StepVisualizer({
                   ? "opacity-100"
                   : "opacity-100"
               }`}
+              onMouseEnter={() => setHoveredStep(index)}
+              onMouseLeave={() => setHoveredStep(null)}
             >
               <div
                 className={`absolute -left-12 flex items-center justify-center w-8 h-8 rounded-full transition-all z-10 ${
@@ -174,7 +178,7 @@ export default function StepVisualizer({
                   {step.name}
                 </h3>
 
-                {index === currentStep && (
+                {(index === currentStep || hoveredStep === index) && (
                   <p
                     className={`text-sm mb-2 ${
                       index < currentStep

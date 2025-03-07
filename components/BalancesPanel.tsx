@@ -61,6 +61,7 @@ export default function BalancesPanel({
               label=""
               displayIcon={true}
               disabled={false}
+              disabledItems={[destinationChain.id]}
             />
           </div>
 
@@ -75,6 +76,7 @@ export default function BalancesPanel({
               label=""
               displayIcon={true}
               disabled={false}
+              disabledItems={[sourceChain.id]}
             />
           </div>
         </div>

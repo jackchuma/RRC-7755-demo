@@ -88,11 +88,25 @@ export default function Home() {
   };
 
   const handleSourceChainChange = (chainId: number) => {
+    // Don't allow selecting the same chain as destination
+    if (chainId === destinationChain.id) {
+      // Optionally show an error message or toast notification
+      console.warn("Source and destination chains cannot be the same");
+      return;
+    }
+
     const newChain = chains.find((chain) => chain.id === chainId);
     if (newChain) setSourceChain(newChain);
   };
 
   const handleDestinationChainChange = (chainId: number) => {
+    // Don't allow selecting the same chain as source
+    if (chainId === sourceChain.id) {
+      // Optionally show an error message or toast notification
+      console.warn("Source and destination chains cannot be the same");
+      return;
+    }
+
     const newChain = chains.find((chain) => chain.id === chainId);
     if (newChain) setDestinationChain(newChain);
   };

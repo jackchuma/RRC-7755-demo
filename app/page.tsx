@@ -24,6 +24,7 @@ import { buildWithdrawGasCall } from "./lib/buildWithdrawGasCall";
 import { buildWithdrawAccountCall } from "./lib/buildWithdrawAccountCall";
 import { SelectionItem } from "@/utils/types/selectionItem";
 import { requests } from "@/config/requests";
+import ETHWarningBanner from "../components/ETHWarningBanner";
 
 const chains: SelectionItem[] = [
   { id: 84532, name: "Base Sepolia", icon: "🔷" },
@@ -44,6 +45,7 @@ export default function Home() {
   const [showWelcomeBanner, setShowWelcomeBanner] = useState(true);
   const [isMintModalOpen, setIsMintModalOpen] = useState(false);
   const [hasUSDC, setHasUSDC] = useState(false);
+  const [showETHWarning, setShowETHWarning] = useState(true);
 
   const sourceChainBalances = useBalance(
     sourceChain.id,
@@ -73,6 +75,10 @@ export default function Home() {
 
     checkUSDC();
   }, [address]);
+
+  // Add a function to check if user has sufficient ETH on both chains
+  const hasETHOnSourceChain = sourceChainBalances.fulfiller > 0.001; // Minimum ETH threshold
+  const hasETHOnDestinationChain = destinationChainBalances.fulfiller > 0.001; // Minimum ETH threshold
 
   const handleNextStep = () => {
     const maxSteps = steps[requestType.id][selectedToken.id].length;
@@ -255,6 +261,19 @@ export default function Home() {
           </div>
         </div>
       )}
+
+      {/* ETH Warning Banner */}
+      {address &&
+        showETHWarning &&
+        (!hasETHOnSourceChain || !hasETHOnDestinationChain) && (
+          <ETHWarningBanner
+            sourceChain={sourceChain}
+            destinationChain={destinationChain}
+            sourceChainHasETH={hasETHOnSourceChain}
+            destinationChainHasETH={hasETHOnDestinationChain}
+            onClose={() => setShowETHWarning(false)}
+          />
+        )}
 
       {/* <div className="max-w-7xl mx-auto"> */}
       <div className="w-full max-w-7xl flex flex-col gap-8">

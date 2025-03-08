@@ -25,6 +25,7 @@ import { buildWithdrawAccountCall } from "./lib/buildWithdrawAccountCall";
 import { SelectionItem } from "@/utils/types/selectionItem";
 import { requests } from "@/config/requests";
 import ETHWarningBanner from "../components/ETHWarningBanner";
+import SmartAccountWarningModal from "../components/SmartAccountWarningModal";
 
 const chains: SelectionItem[] = [
   { id: 84532, name: "Base Sepolia", icon: "🔷" },
@@ -46,6 +47,9 @@ export default function Home() {
   const [isMintModalOpen, setIsMintModalOpen] = useState(false);
   const [hasUSDC, setHasUSDC] = useState(false);
   const [showETHWarning, setShowETHWarning] = useState(true);
+  const [isSmartAccountModalOpen, setIsSmartAccountModalOpen] = useState(false);
+  const [pendingRequestType, setPendingRequestType] =
+    useState<RequestType | null>(null);
 
   const sourceChainBalances = useBalance(
     sourceChain.id,
@@ -112,6 +116,12 @@ export default function Home() {
   };
 
   const handleRequestTypeChange = (type: RequestType) => {
+    if (type === RequestType.SmartAccount) {
+      setPendingRequestType(type);
+      setIsSmartAccountModalOpen(true);
+      return;
+    }
+
     const newRequestType = requests.find((request) => request.id === type);
     if (newRequestType) setRequestType(newRequestType);
     setCurrentStep(0); // Reset steps when changing request type
@@ -242,6 +252,28 @@ export default function Home() {
 
   const toggleMintModal = (open: boolean) => {
     setIsMintModalOpen(open);
+  };
+
+  const handleContinueWithSmartAccount = () => {
+    if (pendingRequestType === null) return;
+
+    const newRequestType = requests.find(
+      (request) => request.id === pendingRequestType
+    );
+    if (newRequestType) setRequestType(newRequestType);
+    setCurrentStep(0);
+    setIsSmartAccountModalOpen(false);
+    setPendingRequestType(null);
+  };
+
+  const handleSwitchToStandard = () => {
+    const standardRequest = requests.find(
+      (request) => request.id === RequestType.Standard
+    );
+    if (standardRequest) setRequestType(standardRequest);
+    setCurrentStep(0);
+    setIsSmartAccountModalOpen(false);
+    setPendingRequestType(null);
   };
 
   return (
@@ -386,6 +418,13 @@ export default function Home() {
         isOpen={isMintModalOpen}
         onClose={() => setIsMintModalOpen(false)}
         chains={chains}
+      />
+
+      <SmartAccountWarningModal
+        isOpen={isSmartAccountModalOpen}
+        onClose={() => setIsSmartAccountModalOpen(false)}
+        onContinue={handleContinueWithSmartAccount}
+        onSwitchToStandard={handleSwitchToStandard}
       />
     </main>
   );
